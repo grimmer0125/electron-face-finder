@@ -40,6 +40,30 @@ module.exports = {
 			{
 				label: 'File',
 				submenu: [
+          {
+            label: 'Open A Source File',
+            type: 'checkbox',
+            // accelerator: 'CmdOrCtrl+O',
+            click: function() {
+              dialog.showOpenDialog({
+                  properties: [
+                    'openFile'
+                    // 'openDirectory'
+                  ],
+                  filters: [
+                    {
+                      name: 'Images',
+                      extensions: constants.SupportedImageExtensions
+                    }
+                  ]
+                },
+                function(fileName) {
+                  if(fileName && self.options.onOpen) {
+                    self.options.onOpenSource(fileName);
+                  }
+                });
+            }
+          },
 					{
 						label: 'Open',
 						accelerator: 'CmdOrCtrl+O',
@@ -52,7 +76,7 @@ module.exports = {
 									filters: [
 										{
 											name: 'Images',
-											extensions: constants.SupportedImageExtensions	
+											extensions: constants.SupportedImageExtensions
 										}
 									]
 								},
@@ -77,7 +101,7 @@ module.exports = {
 									name: selectedFileName,
 									extensions: [ ext ]
 								}]
-							}, function(fileName) {								
+							}, function(fileName) {
 							    if (fileName === undefined) return;
 							    copyFile(currentFile, fileName, function(err) {
 									if (err) {
@@ -209,6 +233,6 @@ module.exports = {
 		var template = this.getMenuTemplate();
 		var menu = Menu.buildFromTemplate(template);
 
-		Menu.setApplicationMenu(menu);		
+		Menu.setApplicationMenu(menu);
 	}
 };

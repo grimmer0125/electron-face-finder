@@ -10,6 +10,9 @@ var ipc = require('ipc');
 var fileSystem = require('./js/file-system');
 var constants = require('./js/constants');
 
+var client = require('./js/ws-client');
+client.createSocket("ws:" + "//localhost" + ":9000", "ws");
+
 // jquery selectors
 var $currentImage = $('#currentImage'),
 	$previous = $('#previous'),
@@ -25,9 +28,29 @@ var imageFiles = [],
 	currentImageFile = '',
 	currentDir = '';
 
+// added by grimmer
+var sourceFilePath = null;
+var candidateImageList = [];
+var CompareType = {
+	SOURCE: "COMPARE_SOURCE",
+	TARGET: "COMPARE_TARGET"
+};
+
+var MatchStatus = {
+	NOTSTART: 0,
+	STARTING: 1,
+	MATCH: 2,
+	NOTMATCH: 3
+};
+
+// imageFile
+// name:
+// 	imgObj:
+
+
 var toggleButtons = function(hasSelectedImage) {
 	// disable buttons?
-	if(hasSelectedImage) {
+	if (hasSelectedImage) {
 		$openFile.hide();
 		$currentImage.show();
 		$controlPanel.show();
@@ -38,29 +61,135 @@ var toggleButtons = function(hasSelectedImage) {
 	}
 };
 
+var getImageMatchResult = function(data) {
+	console.log("getImageMatchResult");
+	var ifMatch = null,
+		imagePath = null;
+	if (data.hasOwnProperty("ifMatch")) {
+		ifMatch = data.ifMatch;
+	}
+	if (data.hasOwnProperty("imagePath")) {
+		imagePath = data.imagePath;
+	}
+
+	if (ifMatch !== null && imagePath != null) {
+		var len = candidateImageList.length;
+		for (var i = 0; i < len; i++) {
+			var imageInfo = candidateImageList[i];
+			if (imageInfo.imagePath == imagePath) {
+
+				if (ifMatch) {
+					imageInfo.status = MatchStatus.MATCH;
+					imageFiles.push(imageInfo.imagePath)
+
+					// try to show the image
+					if (imageFiles.length == 1) {
+						var selectedImageIndex = 0;
+						console.log('to show image !!!');
+						showImage(selectedImageIndex);
+					}
+
+					// var selectedImageIndex = imageFiles.indexOf(fileName);
+					// if (selectedImageIndex === -1) {
+					// 	selectedImageIndex = 0;
+					// }
+					// console.log("index:%s, length:%s", selectedImageIndex, imageFiles);
+					//
+					// if (selectedImageIndex < imageFiles.length) {
+					// 	showImage(selectedImageIndex);
+					// } else {
+					// 	alert('No image files found in this directory.');
+					// }
+
+				} else {
+					imageInfo.status = MatchStatus.NOTMATCH;
+				}
+			}
+		}
+	}
+
+}
+client.registerReceiveHandler(getImageMatchResult);
+
+var getImageThenSendToServer = function(imagePath, type) {
+
+	console.log("get image then send to server,type:%s", type);
+	var t1 = new Date().getTime();
+
+	var imageObj = new Image();
+	// imageObj.src = imageFiles[index];
+	imageObj.src = imagePath;
+
+	imageObj.onload = function() {
+
+		var t2 = new Date().getTime();
+		console.log("loading consumes:", (t2 - t1));
+
+		//var imageObj = document.getElementById("currentImage");
+		// var imageObj = $currentImage[0];
+		var canvas = document.createElement('canvas');
+		canvas.width = imageObj.width;
+		canvas.height = imageObj.height;
+		var context = canvas.getContext('2d');
+		context.drawImage(imageObj, 0, 0);
+		// var imageData = context.getImageData(0, 0, imageObj.width, imageObj.height);
+		// console.log('imageData:', imageData);
+
+		//encoding jpeg and base64, can use this https://www.npmjs.com/package/get-pixels later
+		var dataURL = canvas.toDataURL('image/jpeg', 0.5)
+		var t3 = new Date().getTime();
+		console.log("image obj -> canvas -> jpeg.", (t3 - t2));
+		console.log('path:%s;image width:%s', imagePath, imageObj.width);
+
+		var data = {
+			imagePath: imagePath,
+			type: type,
+			dataURL: dataURL,
+			width: canvas.width,
+			height: canvas.height
+		};
+
+		client.sendData(JSON.stringify(data));
+	};
+
+}
+
 // Shows an image on the page.
 var showImage = function(index) {
 	toggleButtons(true);
 
 	setRotateDegrees(0);
 	$currentImage.data('currentIndex', index);
-	$currentImage.attr('src', imageFiles[index]);
-	currentImageFile = imageFiles[index];
 
-	// Hide show previous/next if there are no more/less files.
-	// $next.toggle(!(index + 1 === imageFiles.length));
-	// $previous.toggle(!(index === 0));
+	var imageObj = new Image();
+	imageObj.src = imageFiles[index]; //'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
+	imageObj.onload = function() {
 
-	// set the stats text
-	var statsText = (index + 1) + ' / ' + imageFiles.length;
-	$directoryStats.text(statsText);
+		// var grimmer2 = new Date().getTime();
+		// var v2 = grimmer2 - grimmer1;
+		// console.log("loading consumes:", v2);
 
-	ipc.send('image-changed', currentImageFile);
+		$currentImage[0].src = imageObj.src;
+		// $currentImage.attr('src', imageFiles[index]).load(function() {
+		console.log('show current image:', currentImageFile);
+		currentImageFile = imageFiles[index];
+
+		// Hide show previous/next if there are no more/less files.
+		// $next.toggle(!(index + 1 === imageFiles.length));
+		// $previous.toggle(!(index === 0));
+
+		// set the stats text
+		var statsText = (index + 1) + ' / ' + imageFiles.length;
+		$directoryStats.text(statsText);
+
+		ipc.send('image-changed', currentImageFile);
+	};
+
 };
 
 var onPreviousClick = function() {
 	var currentImageId = $currentImage.data('currentIndex');
-	if(currentImageId > 0) {
+	if (currentImageId > 0) {
 		showImage(--currentImageId);
 	} else {
 		// we're at 0 -> move to the end.
@@ -72,7 +201,7 @@ $previous.click(onPreviousClick);
 
 var onNextClick = function() {
 	var currentImageId = $currentImage.data('currentIndex');
-	if(currentImageId + 1 < imageFiles.length) {
+	if (currentImageId + 1 < imageFiles.length) {
 		showImage(++currentImageId);
 	} else {
 		// we're at the end - next is the beginning
@@ -87,42 +216,80 @@ var fullscreenButton = document.getElementById("currentImage");
 fullscreenButton.addEventListener("dblclick", toggleFullScreen, false);
 
 function toggleFullScreen() {
-  if (!document.fullscreenElement && !document.webkitFullscreenElement) {  // current working methods
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen();
-    } else if (document.documentElement.webkitRequestFullscreen) {
-      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-    }
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
-  }
+	if (!document.fullscreenElement && !document.webkitFullscreenElement) { // current working methods
+		if (document.documentElement.requestFullscreen) {
+			document.documentElement.requestFullscreen();
+		} else if (document.documentElement.webkitRequestFullscreen) {
+			document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+		}
+	} else {
+		if (document.exitFullscreen) {
+			document.exitFullscreen();
+		} else if (document.webkitExitFullscreen) {
+			document.webkitExitFullscreen();
+		}
+	}
 }
 
 var _loadDir = function(dir, fileName) {
+
 	currentDir = dir;
-	imageFiles = fileSystem.getDirectoryImageFiles(dir);
+	// imageFiles = fileSystem.getDirectoryImageFiles(dir);
+	var tmpImageList = fileSystem.getDirectoryImageFiles(dir);
+	console.log("get candidate image files:", imageFiles);
 
-	var selectedImageIndex = imageFiles.indexOf(fileName);
-	if(selectedImageIndex === -1) {
-		selectedImageIndex = 0;
-	}
+	if (sourceFilePath) {
 
-	if(selectedImageIndex < imageFiles.length) {
-		showImage(selectedImageIndex);	
-	}
-	else {
-		alert('No image files found in this directory.');
+		var num_Images = tmpImageList.length;
+		console.log("open target folder, length:%s", num_Images);
+
+		if (num_Images == 0) {
+			alert('No image files found in this directory.');
+			return;
+		}
+
+		//try to send by ws
+		console.log("test!! open folder and send ");
+		for (var i = 0; i < num_Images; i++) {
+			var selectedImage = tmpImageList[i];
+			getImageThenSendToServer(selectedImage, CompareType.TARGET);
+
+			var imageInfo = {
+				status: MatchStatus.STARTING,
+				imagePath: selectedImage
+			};
+
+			candidateImageList.push(imageInfo);
+		}
+		console.log("test!! end open folder  ");
+	} else {
+		alert('No set source image yet');
+		return;
 	}
 }
 
+var onOpenSource = function(filePath) {
+	//renderer
+	console.log('open Source, process type:', process.type);
+
+	sourceFilePath = filePath + '';
+
+	getImageThenSendToServer(sourceFilePath, CompareType.SOURCE);
+
+	// filePath = filePath + ''; // convert to string
+	// var stat = fs.lstatSync(filePath);
+	// if (stat.isDirectory()) {
+	// 	onDirOpen(filePath);
+	// } else {
+	// 	onFileOpen(filePath);
+	// }
+};
+
 var onOpen = function(filePath) {
+
 	filePath = filePath + ''; // convert to string
 	var stat = fs.lstatSync(filePath);
-	if(stat.isDirectory()) {
+	if (stat.isDirectory()) {
 		onDirOpen(filePath);
 	} else {
 		onFileOpen(filePath);
@@ -143,11 +310,11 @@ var onDirOpen = function(dir) {
 var onFileDelete = function() {
 	// file has been deleted, show previous or next...
 	var index = imageFiles.indexOf(currentImageFile);
-	if(index > -1) {
+	if (index > -1) {
 		imageFiles.splice(index, 1);
 	}
-	if(index === imageFiles.length) index--;
-	if(index < 0) {
+	if (index === imageFiles.length) index--;
+	if (index < 0) {
 		// no more images in this directory - it's empty...
 		toggleButtons(false);
 	} else {
@@ -161,12 +328,12 @@ var getCurrentFile = function() {
 
 var setRotateDegrees = function(deg) {
 	$currentImage.css({
-		 '-webkit-transform' : 'rotate('+deg+'deg)',
-	     '-moz-transform' : 'rotate('+deg+'deg)',  
-	      '-ms-transform' : 'rotate('+deg+'deg)',  
-	       '-o-transform' : 'rotate('+deg+'deg)',  
-	          'transform' : 'rotate('+deg+'deg)',  
-	               'zoom' : 1
+		'-webkit-transform': 'rotate(' + deg + 'deg)',
+		'-moz-transform': 'rotate(' + deg + 'deg)',
+		'-ms-transform': 'rotate(' + deg + 'deg)',
+		'-o-transform': 'rotate(' + deg + 'deg)',
+		'transform': 'rotate(' + deg + 'deg)',
+		'zoom': 1
 	});
 
 	$currentImage.data('rotateDegree', deg);
@@ -190,8 +357,9 @@ $rotateRight.click(function() {
 
 // Initialize the app
 var initialize = function() {
-	var appMenu = require('./js/app-menu'); 
+	var appMenu = require('./js/app-menu');
 	appMenu.initialize({
+		onOpenSource: onOpenSource,
 		onOpen: onOpen,
 		onFileDelete: onFileDelete,
 		getCurrentFile: getCurrentFile
@@ -203,22 +371,20 @@ var initialize = function() {
 	$openFile.click(function() {
 		// TODO: Refactor this... code duplication
 		dialog.showOpenDialog({
-			properties: [
-				'openFile',
-				'openDirectory'
-			],
-			filters: [
-				{
+				properties: [
+					'openFile',
+					'openDirectory'
+				],
+				filters: [{
 					name: 'Images',
-					extensions: constants.SupportedImageExtensions	
+					extensions: constants.SupportedImageExtensions
+				}]
+			},
+			function(fileName) {
+				if (fileName) {
+					onOpen(fileName);
 				}
-			]
-		},
-		function(fileName) {
-			if(fileName) {
-				onOpen(fileName);
-			}
-		});
+			});
 	});
 
 	// handle navigation from left/right clicks

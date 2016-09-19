@@ -25,5 +25,7 @@ app.on('ready', function() {
     });
 
     mainWindow.loadUrl('file://' + __dirname + '/app/index.html');
-});
 
+    // Open the DevTools.
+    mainWindow.webContents.openDevTools();
+});
