@@ -4,10 +4,10 @@
 # How to install dependencies manually with logs before running
 1. `sh checkinstallDocker.sh`
 
-# How to Run (automatically install dependencies)
+# How to Run (automatically install dependencies) without server logs, the only way to see server logs in ths mode is to use `kinematic`
 1. type `npm start`
 
-# How to run in debug mode
+# How to run to see server logs directly
 1. type `npm run dev`
 2. `docker run -p 9000:9000 -v $(pwd)/electricface/:/demo -t -i --name faceserver grimmer0125/openface-nostartdemo bash -c "/demo/src/run.sh"`
 
