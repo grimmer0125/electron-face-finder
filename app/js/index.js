@@ -1,4 +1,8 @@
 'use strict';
+// var y = 100;
+// let x = 5;
+// debugger;
+// console.log("x:", x);
 
 var fs = require('fs');
 var path = require('path');
@@ -11,7 +15,7 @@ var fileSystem = require('./js/file-system');
 var constants = require('./js/constants');
 
 var client = require('./js/ws-client');
-client.createSocket("ws:" + "//localhost" + ":9000", "ws");
+client.createSocket();
 
 // for testing
 var getPixels = require("get-pixels")

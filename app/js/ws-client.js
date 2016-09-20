@@ -1,10 +1,6 @@
-
-var socket = null;
-
 module.exports = {
 
-  // this.receiveHandler = null;
-
+  socket: null,
   receiveHandler :  null,
 
   registerReceiveHandler: function(handler){
@@ -12,85 +8,46 @@ module.exports = {
   },
 
   sendData: function(data){
-    socket.send(data);
+    this.socket.send(data);
   },
-  createSocket: function(address){
 
+  destorySocket: function(){
+    this.socket = null;
+  },
+
+  createSocket: function(address){
+    console.log("start to create socket");
+    address ="ws:" + "//localhost" + ":9000";
     var self = this;
 
-    if(!socket){
-      socket = new WebSocket(address);
+    if(!this.socket){
+      this.socket = new WebSocket(address);
     }
     // socketName = name;
-    socket.binaryType = "arraybuffer"; //"blob";
-    socket.onopen = function() {
+    this.socket.binaryType = "arraybuffer"; //"blob";
+    this.socket.onopen = function() {
       console.log('on open !!!');
-      // $("#serverStatus").html("Connected to " + name);
-      // debugger;
-      // var data2 = JSON.stringify(sentData);
-      // console.log('on open 2!!!');
-
-      // socket.send(data2);
-      // socket.send(sentData);
-      // console.log('on open 3!!!');
     };
-    socket.onmessage = function(e) {
-      console.log("test, get data !!!! :", e.data);
+    this.socket.onmessage = function(e) {
+      console.log("get data !!!! :", e.data);
       // debugger;
       var data = JSON.parse(e.data);
       self.receiveHandler(data);
     };
-    socket.onerror = function(e) {
+    this.socket.onerror = function(e) {
       console.log("Error creating WebSocket connection to " + address);
       console.log(e);
+      self.destorySocket();
+      setTimeout(self.createSocket.bind(self), 3000);
     };
 
-    // var fun =
-    // var fun2
-    socket.onclose = function(e) {
-      if (e.target == socket) {
+    this.socket.onclose = function(e) {
+      if (e.target == this.socket) {
         console.log("Disconnected");
+        self.destorySocket();
+        setTimeout(self.createSocket.bind(self), 3000);
         // $("#serverStatus").html("Disconnected.");
       }
     };
   }
-}
-// var wsModule = {
-//
-// }
-// function testWS(){
-// function createSocket(address, name) {
-// 	socket = new WebSocket(address);
-// 	// socketName = name;
-// 	socket.binaryType = "arraybuffer"; //"blob";
-// 	socket.onopen = function() {
-// 		console.log('on open !!!');
-// 		// $("#serverStatus").html("Connected to " + name);
-// 		// debugger;
-// 		var data2 = JSON.stringify(sentData);
-// 		console.log('on open 2!!!');
-//
-// 		socket.send(data2);
-// 		// socket.send(sentData);
-// 		console.log('on open 3!!!');
-//
-//
-// 	}
-// 	socket.onmessage = function(e) {
-// 		console.log("message:", e);
-// 	}
-// 	socket.onerror = function(e) {
-// 		console.log("Error creating WebSocket connection to " + address);
-// 		console.log(e);
-// 	}
-// 	socket.onclose = function(e) {
-// 		if (e.target == socket) {
-// 			console.log("Disconnected");
-// 			// $("#serverStatus").html("Disconnected.");
-// 		}
-// 	}
-// }
-
-function sendData(data) {
-	socket.send(data);
 }
