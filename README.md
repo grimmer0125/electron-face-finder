@@ -5,16 +5,16 @@
 
 ## Install (Optional)
 
-### How to install dependencies manually with logs
+### Install dependencies manually with logs
 1. Install Docker of Mac if you do not have. Type `sh checkinstallDocker.sh`. If you want to try on Win/Linux, you need to download from [https://www.docker.com](https://www.docker.com) and install it from UI.
 2. After installing it, type `sh pullimage.js` to install the needed Docker image.
 
 ## Run
 
-### How to Run (automatically install dependencies) without server logs, the only way to see server logs in this mode is to use [kinematic](https://kitematic.com/)
-1. type `npm start`. (Don't need to execute the above `sh checkinstallDocker.sh` & `sh pullimage.js` to install)
+### method 1- Run (and automatically install dependencies) without server logs, the only way to see server logs in this mode is to use [kinematic](https://kitematic.com/)
+1. type `npm start`. (this method does not need to execute the above `sh checkinstallDocker.sh` & `sh pullimage.js` to install)
 
-### How to run to see server logs directly
+### method 2- Run with monitor server logs directly
 1. type `npm run dev`
 2. open another terminal. type `sh start-dev.sh`
 
@@ -38,6 +38,7 @@ A cross-platform Image Viewer based on Electron. It runs on OS X, Windows and Li
 
 # Features
 
+- Find the matched face images. From the menu, `file->open a source file`, select a source image including 1 face. Then click 'open' of menu or click open button , to select folder/any other file. Later it will show matched images.     
 - Open a Directory and browse it's images
 - Open an Image File and browse the images inside the same directory
 - Fast navigation through the images via Left/Right keyboard buttons
