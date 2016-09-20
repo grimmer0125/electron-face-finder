@@ -1,8 +1,4 @@
 'use strict';
-// var y = 100;
-// let x = 5;
-// debugger;
-// console.log("x:", x);
 
 var fs = require('fs');
 var path = require('path');
@@ -94,6 +90,8 @@ var getImageMatchResult = function(data) {
 						var selectedImageIndex = 0;
 						console.log('to show image !!!');
 						showImage(selectedImageIndex);
+					} else {
+						increaseCount();
 					}
 
 					// var selectedImageIndex = imageFiles.indexOf(fileName);
@@ -159,6 +157,13 @@ var getImageThenSendToServer = function(imagePath, type) {
 		client.sendData(JSON.stringify(data));
 	};
 
+}
+
+var increaseCount = function() {
+	var index = imageFiles.indexOf(currentImageFile);
+
+	var statsText = (index + 1) + ' / ' + imageFiles.length;
+	$directoryStats.text(statsText);
 }
 
 // Shows an image on the page.
@@ -344,6 +349,7 @@ var onDirOpen = function(dir) {
 };
 
 var onFileDelete = function() {
+	return;
 	// file has been deleted, show previous or next...
 	var index = imageFiles.indexOf(currentImageFile);
 	if (index > -1) {
