@@ -1,5 +1,14 @@
-# How to debug
-1. run `npm run dev`
+<!-- # How to install -->
+<!-- 1.type 'npm run prepare' -->
+
+# How to install dependencies manually with logs before running
+1. `sh checkinstallDocker.sh`
+
+# How to Run (automatically install dependencies)
+1. type `npm start`
+
+# How to run in debug mode
+1. type `npm run dev`
 2. `docker run -p 9000:9000 -v $(pwd)/electricface/:/demo -t -i --name faceserver grimmer0125/openface-nostartdemo bash -c "/demo/src/run.sh"`
 
 # Image Viewer

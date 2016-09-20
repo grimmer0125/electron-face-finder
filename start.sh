@@ -1,6 +1,3 @@
-# echo "try to pull image"
-# docker pull grimmer0125/openface-nostartdemo
-# echo "after pulling"
 docker stop faceserver
 docker rm faceserver
 echo "try to docker run"
