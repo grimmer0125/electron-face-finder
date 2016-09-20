@@ -1,15 +1,22 @@
 <!-- # How to install -->
 <!-- 1.type 'npm run prepare' -->
 
-# How to install dependencies manually with logs before running
-1. `sh checkinstallDocker.sh`
+# Currently this only tested on Mac platform
 
-# How to Run (automatically install dependencies) without server logs, the only way to see server logs in ths mode is to use `kinematic`
-1. type `npm start`
+## Install (Optional)
 
-# How to run to see server logs directly
+### How to install dependencies manually with logs
+1. Install Docker of Mac if you do not have. Type `sh checkinstallDocker.sh`. If you want to try on Win/Linux, you need to download from [https://www.docker.com](https://www.docker.com) and install it from UI.
+2. After installing it, type `sh pullimage.js` to install the needed Docker image.
+
+## Run
+
+### How to Run (automatically install dependencies) without server logs, the only way to see server logs in this mode is to use [kinematic](https://kitematic.com/)
+1. type `npm start`. (Don't need to execute the above `sh checkinstallDocker.sh` & `sh pullimage.js` to install)
+
+### How to run to see server logs directly
 1. type `npm run dev`
-2. `docker run -p 9000:9000 -v $(pwd)/electricface/:/demo -t -i --name faceserver grimmer0125/openface-nostartdemo bash -c "/demo/src/run.sh"`
+2. open another terminal. type `sh start-dev.sh`
 
 # Image Viewer
 
