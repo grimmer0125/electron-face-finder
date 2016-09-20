@@ -1,3 +1,7 @@
+# How to debug
+1. run `npm run dev`
+2. `docker run -p 9000:9000 -v $(pwd)/electricface/:/demo -t -i --name faceserver grimmer0125/openface-nostartdemo bash -c "/demo/src/run.sh"`
+
 # Image Viewer
 
 A cross-platform Image Viewer based on Electron. It runs on OS X, Windows and Linux. It provides an easy interface to browse a directory of images using the left and right keyboard buttons.
@@ -23,27 +27,6 @@ A cross-platform Image Viewer based on Electron. It runs on OS X, Windows and Li
 - Fast navigation through the images via Left/Right keyboard buttons
 - Rotate an image clockwise/anti-clockwise
 - Save/Move the image to a new location
-
-# Installer
-
-Download and install the Image Viewer with simple one-click installation. Choose from the platforms below:
-
-- OS X:
-[Image Viewer.dmg](https://github.com/yyosifov/image-viewer/raw/master/dist/osx/Image%20Viewer.dmg)
-- Windows:
-[Image Viewer Setup.exe](https://github.com/yyosifov/image-viewer/raw/master/dist/win/Image%20Viewer%20Setup.exe)
-
-# How to run manually
-
-- First clone the repo
-
-- Install the dependencies
-
-> npm install
-
-- Run the app
-
-> npm start
 
 <h2 id="contributors">Contributors</h2>
 

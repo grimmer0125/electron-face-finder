@@ -3,11 +3,38 @@
 // import {spawnSync} from 'child_process';
 // import {spawn} from 'child_process';
 // require('child_process').spawn()
+console.log("docker 1");
+var needIntall = false;
 var child_process =  require('child_process');
-child_process.spawn('sh', ["start.sh"], {
- // detached: true, <-????
- // stdio: [ 'ignore', out, err ]
-});
+var sync = require('child_process').spawnSync;
+
+var checkResult = sync('sh', ["checkinstall.sh"]);
+var output = checkResult.stdout.toString();
+console.log(output);
+if(output.indexOf("docker is running") >= 0){
+  console.log("ok");
+} else if (output.indexOf("not installed yet") >= 0) {
+  // try to install docker for mac
+  needIntall = true;
+  console.log("not ok");
+}
+console.log("docker 2");
+
+if (needIntall){
+  console.log("try to download and install docker");
+  var installResult = sync('sh', ["tryinstall.sh"]);
+  var output = installResult.stdout.toString();
+  console.log(output);
+}
+console.log("docker 3");
+
+var child_process =  require('child_process');
+if (process.env.NODE_ENV =="dev"){
+  console.log("use dev");
+  child_process.spawn('sh', ["start-dev.sh"], {});
+} else {
+  child_process.spawn('sh', ["start.sh"], {});
+}
 
 var app = require('app');
 var BrowserWindow = require('browser-window');
