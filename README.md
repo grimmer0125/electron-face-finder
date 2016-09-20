@@ -1,7 +1,7 @@
 <!-- # How to install -->
 <!-- 1.type 'npm run prepare' -->
 
-# Currently this only tested on Mac platform
+# Currently this only tested on Mac platform. This experimental project is based on [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface) and [https://github.com/yyosifov/image-viewer](https://github.com/yyosifov/image-viewer).
 
 ## Install (Optional)
 
@@ -12,7 +12,7 @@
 ## Run
 
 ### method 1- Run (and automatically install dependencies) without server logs, the only way to see server logs in this mode is to use [kinematic](https://kitematic.com/)
-1. type `npm start`. (this method does not need to execute the above `sh checkinstallDocker.sh` & `sh pullimage.js` to install)
+1. type `npm start`. (this method does not need to execute the above `sh checkinstallDocker.sh` & `sh pullimage.sh` to install)
 
 ### method 2- Run with monitor server logs directly
 1. type `npm run dev`
@@ -45,8 +45,3 @@ A cross-platform Image Viewer based on Electron. It runs on OS X, Windows and Li
 - Rotate an image clockwise/anti-clockwise
 - Save/Move the image to a new location
 
-<h2 id="contributors">Contributors</h2>
-
-The following is a list of all the people that have helped build the Image-Viewer. Thanks for your contributions!
-
-[<img alt="yyosifov" src="https://avatars1.githubusercontent.com/u/2012493?v=3&s=460" width="117">](https://github.com/yyosifov)[<img alt="akashnimare" src="https://avatars1.githubusercontent.com/u/2263909?v=3&s=460" width="117">](https://github.com/akashnimare)
