@@ -13,6 +13,9 @@ var constants = require('./js/constants');
 var client = require('./js/ws-client');
 client.createSocket("ws:" + "//localhost" + ":9000", "ws");
 
+// for testing
+var getPixels = require("get-pixels")
+
 // jquery selectors
 var $currentImage = $('#currentImage'),
 	$previous = $('#previous'),
@@ -231,7 +234,36 @@ function toggleFullScreen() {
 	}
 }
 
+function testArrayBufferJSON(imageFile) {
+	getPixels(imageFile, function(err, pixels) {
+		if (err) {
+			console.log("Bad image path")
+			return
+		}
+		console.log("got pixels:", pixels.shape.slice())
+
+		var data = {
+			type: 'COMPARE',
+			data: pixels.data,
+			shape: pixels.shape
+				// width: canvas.width,
+				// height: canvas.height
+		};
+		var sendData = JSON.stringify(data);
+		console.log("after jsoned pixels:", sendData.length);
+		client.sendData(sendData);
+		console.log("after send");
+	})
+
+}
+
 var _loadDir = function(dir, fileName) {
+
+	// for testing
+	// if (true) {
+	// 	testArrayBufferJSON(fileName);
+	// 	return;
+	// }
 
 	currentDir = dir;
 	// imageFiles = fileSystem.getDirectoryImageFiles(dir);
