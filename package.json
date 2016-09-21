@@ -1,6 +1,6 @@
 {
   "name": "electron-face-finder",
-  "productName": "Electron Face Finder",
+  "productName": "FaceFinder",
   "version": "0.1.0",
   "description": "To find the images having the specified face.",
   "main": "main.js",
@@ -20,8 +20,8 @@
     "start": "electron .",
     "clean": "rm -rf ./dist",
     "clean:osx": "rm -rf ./dist/osx",
-    "build": "npm run clean && npm run build:osx",
-    "build:osx": "npm run clean:osx && electron-packager . --out=dist/osx --platform=darwin --arch=x64"
+    "build-osx": "npm run clean:osx && electron-packager . \"FaceFinder\" --out=dist/osx --platform=darwin --arch=x64 --version=0.31.0 --icon=assets/osx/icon.icns",
+    "pack-osx": "npm run build-osx && electron-builder \"dist/osx/FaceFinder-darwin-x64/FaceFinder.app\" --platform=osx --out=\"dist/osx\"  --config=packager.json"
   },
   "author": "",
   "license": "ISC"

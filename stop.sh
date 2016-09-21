@@ -1,2 +1,1 @@
-docker stop faceserver
-docker rm faceserver
+docker rm -f faceserver

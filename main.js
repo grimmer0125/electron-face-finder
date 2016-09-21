@@ -16,28 +16,27 @@ var projectPath = __dirname;
 
 // var needIntall = false;
 var child_process =  require('child_process');
-var sync = require('child_process').spawnSync;
-
-var checkResult = sync('sh', [projectPath+"/checkinstallDocker.sh"]);
-var output = checkResult.stdout.toString();
-console.log(output);
-if(output.indexOf("docker is running") >= 0){
-  console.log("ok");
-} else if (output.indexOf("not installed yet") >= 0) {
-  // try to install docker for mac
-  // needIntall = true;
-  console.log("not ok, installing");
-}
-console.log("checked docker of Mac");
-
-// if (needIntall){
-//   console.log("try to download and install docker");
-//   var installResult = sync('sh', ["tryinstallDocker.sh"]);
-//   var output = installResult.stdout.toString();
-//   console.log(output);
+// var sync = require('child_process').spawnSync;
+// var checkResult = sync('sh', [projectPath+"/checkinstallDocker.sh"]);
+// var output = checkResult.stdout.toString();
+// console.log(output);
+// if(output.indexOf("docker is running") >= 0){
+//   console.log("ok");
+// } else if (output.indexOf("not installed yet") >= 0) {
+//   // try to install docker for mac
+//   // needIntall = true;
+//   console.log("not ok, installing");
 // }
-child_process.spawn('sh', [projectPath+"/pullimage.sh"], {});
-console.log("pulled docker image");
+// console.log("checked docker of Mac");
+//
+// // if (needIntall){
+// //   console.log("try to download and install docker");
+// //   var installResult = sync('sh', ["tryinstallDocker.sh"]);
+// //   var output = installResult.stdout.toString();
+// //   console.log(output);
+// // }
+// child_process.spawn('sh', [projectPath+"/pullimage.sh"], {});
+// console.log("pulled docker image");
 
 if (process.env.NODE_ENV =="dev"){
   console.log("use dev");
