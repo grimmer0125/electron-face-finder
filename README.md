@@ -31,15 +31,15 @@ It will search all the sub-folders and consume a lot time (maybe hours, depends 
 
 - OS X:
 
-![alt tag](http://i.imgur.com/JM0GaFJ.jpg)
+![alt tag](https://grimmer.io/images/electron-dog.png)
 
-- Windows:
+<!--- Windows:-->
 
-![alt tag](http://i.imgur.com/uYsD4yy.png)
+<!--![alt tag](http://i.imgur.com/uYsD4yy.png)-->
 
-- Linux:
+<!--- Linux:-->
 
-![alt tag](http://i.imgur.com/KXlmv3o.png)
+<!--![alt tag](http://i.imgur.com/KXlmv3o.png)-->
 
 # Features
 
