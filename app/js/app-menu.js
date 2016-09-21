@@ -111,32 +111,32 @@ module.exports = {
 							});
 						}
 					},
-					{
-						label: 'Delete',
-						click: function() {
-							var currentFile = self.options.getCurrentFile();
-
-							dialog.showMessageBox({
-								type: 'info',
-								buttons: [
-									'Yes',
-									'No'
-								],
-								title: 'Confirm delete',
-								message: 'Are you sure you want to delete file "' + currentFile + '"?'
-							}, function(buttonIndex) {
-								if(buttonIndex === 1) return;
-
-								fs.unlink(currentFile, function(err) {
-									if(err) {
-										return dialog.showErrorBox("File Delete Error", err.message);
-									}
-
-									self.options.onFileDelete();
-								});
-							});
-						}
-					},
+					// {
+					// 	label: 'Delete',
+					// 	click: function() {
+					// 		var currentFile = self.options.getCurrentFile();
+          //
+					// 		dialog.showMessageBox({
+					// 			type: 'info',
+					// 			buttons: [
+					// 				'Yes',
+					// 				'No'
+					// 			],
+					// 			title: 'Confirm delete',
+					// 			message: 'Are you sure you want to delete file "' + currentFile + '"?'
+					// 		}, function(buttonIndex) {
+					// 			if(buttonIndex === 1) return;
+          //
+					// 			fs.unlink(currentFile, function(err) {
+					// 				if(err) {
+					// 					return dialog.showErrorBox("File Delete Error", err.message);
+					// 				}
+          //
+					// 				self.options.onFileDelete();
+					// 			});
+					// 		});
+					// 	}
+					// },
 					{
 						label: 'Quit',
                         accelerator: 'CmdOrCtrl+Q',
@@ -168,7 +168,7 @@ module.exports = {
 
 		// for MacOS X
 		if (process.platform == 'darwin') {
-			  var name = 'Image Viewer';
+			  var name = 'FaceFinder';
 			  template.unshift({
 			    label: name,
 			    submenu: [
