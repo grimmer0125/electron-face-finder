@@ -1,10 +1,11 @@
 <!-- # How to install -->
 <!-- 1.type 'npm run prepare' -->
 
-# Currently this only tested on Mac platform. This experimental project is based on [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface) and [https://github.com/yyosifov/image-viewer](https://github.com/yyosifov/image-viewer).
+## Currently this only tested on Mac platform. This experimental project is based on [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface) and [https://github.com/yyosifov/image-viewer](https://github.com/yyosifov/image-viewer).
 
 ### Known Bugs:
-1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container.  
+1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon. 
+
 ## Install (Optional)
 
 ### Install dependencies manually with logs
