@@ -3,6 +3,8 @@
 
 # Currently this only tested on Mac platform. This experimental project is based on [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface) and [https://github.com/yyosifov/image-viewer](https://github.com/yyosifov/image-viewer).
 
+### Known Bugs:
+1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container.  
 ## Install (Optional)
 
 ### Install dependencies manually with logs
