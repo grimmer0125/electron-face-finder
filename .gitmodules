@@ -1,0 +1,4 @@
+[submodule "openface"]
+	path = openface
+	url = https://grimmer0125@github.com/grimmer0125/openface.git
+	branch = electricface
