@@ -1,3 +1,3 @@
 run:
-	npm run dev &
-	./scripts/docker-stop.sh & ./scripts/docker-start-dev.sh
+	npm run debug &
+	./scripts/docker-stop.sh & ./scripts/docker-start-debug.sh

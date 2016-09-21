@@ -28,14 +28,18 @@ var child_process =  require('child_process');
 // child_process.spawn('sh', [projectPath+"/pullimage.sh"], {});
 // console.log("pulled docker image");
 
-if (process.env.NODE_ENV =="dev"){
-  console.log("use dev");
+if (process.env.NODE_ENV =="debug"){
+  console.log("use debug");
   // child_process.spawn('sh', ["start-dev.sh"], {});
-} else {
+} else if (process.env.NODE_ENV =="dev"){
 
-  console.log("start script:",projectPath+"/scripts/docker-start.sh" );
-  // var prefix="/Users/grimmer/git/image-viewer";
-  child_process.spawn('sh', [projectPath+"/scripts/docker-start.sh"], {});
+  var startScriptPath = projectPath+"/scripts/docker-start-dev.sh";
+  console.log("start dev script:", startScriptPath);
+  child_process.spawn('sh', [startScriptPath], {});
+} else {
+  var startScriptPath = projectPath+"/scripts/docker-start.sh";
+  console.log("start script:", startScriptPath);
+  child_process.spawn('sh', [startScriptPath], {});
 }
 
 var app = require('app');

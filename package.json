@@ -16,8 +16,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_ENV=dev electron .",
-    "start": "electron .",
+    "debug": "NODE_ENV=debug electron .",
+    "start": "NODE_ENV=dev electron .",
     "clean": "rm -rf ./dist",
     "clean:osx": "rm -rf ./dist/osx",
     "build-osx": "npm run clean:osx && electron-packager . \"FaceFinder\" --out=dist/osx --platform=darwin --arch=x64 --version=0.31.0 --icon=assets/osx/icon.icns",
