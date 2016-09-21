@@ -372,7 +372,7 @@ class OpenFaceServerProtocol(WebSocketServerProtocol):
         rgbFrame = self.convertDataURLtoRGB(dataURL, width, height)
         if self.sourceFaceNDArray is not None:
             targetNDArray = self.getRep(rgbFrame)
-            if targetNDArray is not None and self.sourceFaceNDArray is not None:
+            if targetNDArray is not None:
                 # start to compare these two frames
                 d = targetNDArray - self.sourceFaceNDArray
                 distance = np.dot(d, d)
@@ -392,6 +392,10 @@ class OpenFaceServerProtocol(WebSocketServerProtocol):
                 # if not unicode, only need to use json.dumps() w/ .encode
                 self.sendMessage(json.dumps(res, ensure_ascii=False).encode('utf8'))
                 return
+            else:
+                print("targetNDArray is none")
+        else:
+            print("sourece is none when handling target files")
 
                 # print("Squared l2 distance between representations: {:0.3f}".format(distance))
         print("something wrong when comparing frames")

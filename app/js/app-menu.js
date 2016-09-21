@@ -65,7 +65,7 @@ module.exports = {
             }
           },
 					{
-						label: 'Open',
+						label: 'Open target folder/fiile',
 						accelerator: 'CmdOrCtrl+O',
 						click: function() {
 							dialog.showOpenDialog({

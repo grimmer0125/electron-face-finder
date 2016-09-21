@@ -35,7 +35,7 @@ module.exports = {
         if(this.sendQueue.length>0){
           process.nextTick(function(){
             console.log("send in ticker");
-            this.sendData();
+            self.sendData();
           });
         }
       } else {
@@ -51,7 +51,9 @@ module.exports = {
 
   destorySocket: function(){
     console.log("try to destory socket");
-    this.socket.close();
+    if(this.socket) {
+      this.socket.close();
+    }
     this.socket = null;
   },
 

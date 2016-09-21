@@ -18,10 +18,12 @@ var getPixels = require("get-pixels")
 
 // jquery selectors
 var $currentImage = $('#currentImage'),
+	$sourceImage = $('#sourceImage'),
 	$previous = $('#previous'),
 	$next = $('#next'),
 	$directoryStats = $('#directoryStats'),
 	$openFile = $('#open-file'),
+	$openFileSource = $('#open-file-source'),
 	$controlPanel = $('#control-panel'),
 	$rotateLeft = $('#rotate-left'),
 	$rotateRight = $('#rotate-right');
@@ -64,6 +66,35 @@ var toggleButtons = function(hasSelectedImage) {
 	}
 };
 
+function resetAllImagesStatus() {
+
+	var count = 0;
+	var len = candidateImageList.length;
+	for (var i = 0; i < len; i++) {
+		var imageInfo = candidateImageList[i];
+		imageInfo.status = MatchStatus.STARTING;
+		// if (imageInfo.status == MatchStatus.STARTING) {
+		// 	count++;
+		// }
+	}
+
+	return count;
+}
+
+function countHandlingImages() {
+
+	var count = 0;
+	var len = candidateImageList.length;
+	for (var i = 0; i < len; i++) {
+		var imageInfo = candidateImageList[i];
+		if (imageInfo.status == MatchStatus.STARTING) {
+			count++;
+		}
+	}
+
+	return count;
+}
+
 var afterGetRepresentationOrCompare = function(data) {
 
 	console.log("afterGetRepresentationOrCompare:", data);
@@ -82,6 +113,7 @@ var afterGetRepresentationOrCompare = function(data) {
 
 			return;
 		}
+		console.log("get source file representation ok !!!");
 
 		var num_Images = candidateImageList.length;
 		if (num_Images > 0) {
@@ -124,16 +156,20 @@ var afterGetRepresentationOrCompare = function(data) {
 						var selectedImageIndex = 0;
 						console.log('to show image !!!');
 						showImage(selectedImageIndex);
-					} else {
-						increaseCount();
 					}
+					// else {
+					// 	updateStatusText();
+					// }
 				} else {
 					imageInfo.status = MatchStatus.NOTMATCH;
 				}
+
+				updateStatusText();
+
+				return;
 			}
 		}
 	}
-
 }
 client.registerReceiveHandler(afterGetRepresentationOrCompare);
 
@@ -180,12 +216,21 @@ var getImageThenSendToServer = function(imagePath, type) {
 
 }
 
-var increaseCount = function() {
-	var index = imageFiles.indexOf(currentImageFile);
 
-	var statsText = (index + 1) + ' / ' + imageFiles.length;
+
+function updateStatusText() {
+	var index = imageFiles.indexOf(currentImageFile);
+	var statsText = (index + 1) + 'th/' + imageFiles.length +
+		"(matched)" + "/" + candidateImageList.length + "(total)/" +
+		countHandlingImages() + "(Handling)";
 	$directoryStats.text(statsText);
 }
+// var increaseCount = function() {
+// 	var index = imageFiles.indexOf(currentImageFile);
+//
+// 	var statsText = (index + 1) + ' / ' + imageFiles.length;
+// 	$directoryStats.text(statsText);
+// }
 
 // Shows an image on the page.
 var showImage = function(index) {
@@ -212,8 +257,9 @@ var showImage = function(index) {
 		// $previous.toggle(!(index === 0));
 
 		// set the stats text
-		var statsText = (index + 1) + ' / ' + imageFiles.length;
-		$directoryStats.text(statsText);
+		updateStatusText();
+		// var statsText = (index + 1) + ' / ' + imageFiles.length;
+		// $directoryStats.text(statsText);
 
 		ipc.send('image-changed', currentImageFile);
 	};
@@ -309,9 +355,10 @@ var _loadDir = function(dir, fileName) {
 	// console.log("2");
 	//
 	// return;
-
+	currentImageFile = '';
 	imageFiles = [];
 	candidateImageList = [];
+	updateStatusText();
 
 	// for testing
 	// if (true) {
@@ -358,10 +405,18 @@ var _loadDir = function(dir, fileName) {
 
 var onOpenSource = function(filePath) {
 	//renderer
-	console.log('open Source, process type:', process.type);
+	console.log('open Source and send to server');
 	console.log("clear previous imageFiles");
 	imageFiles = [];
+	currentImageFile = '';
+	resetAllImagesStatus();
+	updateStatusText();
 	sourceFilePath = filePath + '';
+
+	// var imageObj = new Image();
+	// imageObj.src = filePath;
+	$sourceImage[0].src = filePath; //imageObj.src;
+	// $currentImage.attr('src', imageFiles[index]).load(function() {
 
 	getImageThenSendToServer(sourceFilePath, CompareType.SOURCE);
 
@@ -457,6 +512,23 @@ var initialize = function() {
 
 	// no files selected
 	toggleButtons(false);
+
+	$openFileSource.click(function() {
+		dialog.showOpenDialog({
+				properties: [
+					'openFile'
+				],
+				filters: [{
+					name: 'Images',
+					extensions: constants.SupportedImageExtensions
+				}]
+			},
+			function(fileName) {
+				if (fileName) {
+					onOpenSource(fileName);
+				}
+			});
+	});
 
 	$openFile.click(function() {
 		// TODO: Refactor this... code duplication

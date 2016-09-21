@@ -14,6 +14,18 @@ html, body, .container-fluid {
 	margin-right: auto;
 	width: 100%;
 }
+.img-source {
+	height: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	width: 100%;
+
+	padding-top: 10px;
+	max-width: 50%;
+	max-height: 100%;
+	display: block;
+	/*debug: background-color: green;*/
+}
 .img-thumb {
 	padding-top: 10px;
 	max-width: 100%;
