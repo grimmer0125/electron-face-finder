@@ -1,21 +1,11 @@
 'use strict';
 
-// import {spawnSync} from 'child_process';
-// import {spawn} from 'child_process';
-// require('child_process').spawn()
 console.log("start");
 
-// in index:
-// dir:/Users/grimmer/git/image-viewer/app;
-// respath:/Users/grimmer/git/image-viewer/node_modules/electron-prebuilt/dist/Electron.app/Contents/Resources
-
-// dir: /Users/grimmer/git/image-viewer
-// path: /Users/grimmer/git/image-viewer/node_modules/electron-prebuilt/dist/Electron.app/Contents/Resources
-
 var projectPath = __dirname;
-
-// var needIntall = false;
 var child_process =  require('child_process');
+// var needIntall = false;
+
 // var sync = require('child_process').spawnSync;
 // var checkResult = sync('sh', [projectPath+"/checkinstallDocker.sh"]);
 // var output = checkResult.stdout.toString();
@@ -43,8 +33,9 @@ if (process.env.NODE_ENV =="dev"){
   // child_process.spawn('sh', ["start-dev.sh"], {});
 } else {
 
+  console.log("start script:",projectPath+"/scripts/docker-start.sh" );
   // var prefix="/Users/grimmer/git/image-viewer";
-  child_process.spawn('sh', [projectPath+"/start.sh"], {});
+  child_process.spawn('sh', [projectPath+"/scripts/docker-start.sh"], {});
 }
 
 var app = require('app');
@@ -78,7 +69,7 @@ app.on('ready', function() {
 
 app.on('before-quit', function() {
   console.log("before-quit");
-  child_process.spawn('sh', [projectPath+"/stop.sh"], {
+  child_process.spawn('sh', [projectPath+"/scripts/docker-stop.sh"], {
    // detached: true, <-????
    // stdio: [ 'ignore', out, err ]
   });
