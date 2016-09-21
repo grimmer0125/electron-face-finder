@@ -64,8 +64,42 @@ var toggleButtons = function(hasSelectedImage) {
 	}
 };
 
-var getImageMatchResult = function(data) {
-	console.log("getImageMatchResult");
+var afterGetRepresentationOrCompare = function(data) {
+
+	console.log("afterGetRepresentationOrCompare:", data);
+	// if (data.hasOwnProperty("type")) {
+	//
+	// 	if (data.type == CompareType.SOURCE) {
+	// 		console.log("abc");
+	// 	}
+	// }
+
+	if (data.hasOwnProperty("type") && data.type == CompareType.SOURCE) {
+
+		if (data.representationStatus == false) {
+
+			alert('Can not find any face in the source image. please select again');
+
+			return;
+		}
+
+		var num_Images = candidateImageList.length;
+		if (num_Images > 0) {
+			console.log("open folder before selecting source, start to match");
+			for (var i = 0; i < num_Images; i++) {
+				var selectedImageInfo = candidateImageList[i];
+				getImageThenSendToServer(selectedImageInfo.imagePath, CompareType.TARGET);
+				selectedImageInfo.status = MatchStatus.STARTING;
+			}
+			console.log(
+				"open folder before selecting source, end sending all match data");
+
+		}
+
+		return;
+	}
+	console.log("afterCompare");
+
 	var ifMatch = null,
 		imagePath = null;
 	if (data.hasOwnProperty("ifMatch")) {
@@ -93,19 +127,6 @@ var getImageMatchResult = function(data) {
 					} else {
 						increaseCount();
 					}
-
-					// var selectedImageIndex = imageFiles.indexOf(fileName);
-					// if (selectedImageIndex === -1) {
-					// 	selectedImageIndex = 0;
-					// }
-					// console.log("index:%s, length:%s", selectedImageIndex, imageFiles);
-					//
-					// if (selectedImageIndex < imageFiles.length) {
-					// 	showImage(selectedImageIndex);
-					// } else {
-					// 	alert('No image files found in this directory.');
-					// }
-
 				} else {
 					imageInfo.status = MatchStatus.NOTMATCH;
 				}
@@ -114,7 +135,7 @@ var getImageMatchResult = function(data) {
 	}
 
 }
-client.registerReceiveHandler(getImageMatchResult);
+client.registerReceiveHandler(afterGetRepresentationOrCompare);
 
 var getImageThenSendToServer = function(imagePath, type) {
 
@@ -268,6 +289,9 @@ function testArrayBufferJSON(imageFile) {
 
 var _loadDir = function(dir, fileName) {
 
+	imageFiles = [];
+	candidateImageList = [];
+
 	// for testing
 	// if (true) {
 	// 	testArrayBufferJSON(fileName);
@@ -279,30 +303,33 @@ var _loadDir = function(dir, fileName) {
 	var tmpImageList = fileSystem.getDirectoryImageFiles(dir);
 	console.log("get candidate image files:", imageFiles);
 
+	var num_Images = tmpImageList.length;
+	console.log("open target folder, length:%s", num_Images);
+
+	if (num_Images == 0) {
+		alert('No image files found in this directory.');
+		return;
+	}
+
+	//try to send by ws
+	console.log("open folder after selecting source, start to match");
+	for (var i = 0; i < num_Images; i++) {
+		var selectedImage = tmpImageList[i];
+		var imageInfo = {
+			imagePath: selectedImage
+		};
+
+		if (sourceFilePath) {
+			getImageThenSendToServer(selectedImage, CompareType.TARGET);
+			imageInfo.status = MatchStatus.STARTING;
+		}
+
+		candidateImageList.push(imageInfo);
+	}
+	console.log("open folder after selecting source, end sending all match data");
+
 	if (sourceFilePath) {
 
-		var num_Images = tmpImageList.length;
-		console.log("open target folder, length:%s", num_Images);
-
-		if (num_Images == 0) {
-			alert('No image files found in this directory.');
-			return;
-		}
-
-		//try to send by ws
-		console.log("test!! open folder and send ");
-		for (var i = 0; i < num_Images; i++) {
-			var selectedImage = tmpImageList[i];
-			getImageThenSendToServer(selectedImage, CompareType.TARGET);
-
-			var imageInfo = {
-				status: MatchStatus.STARTING,
-				imagePath: selectedImage
-			};
-
-			candidateImageList.push(imageInfo);
-		}
-		console.log("test!! end open folder  ");
 	} else {
 		alert('No set source image yet');
 		return;
@@ -312,7 +339,8 @@ var _loadDir = function(dir, fileName) {
 var onOpenSource = function(filePath) {
 	//renderer
 	console.log('open Source, process type:', process.type);
-
+	console.log("clear previous imageFiles");
+	imageFiles = [];
 	sourceFilePath = filePath + '';
 
 	getImageThenSendToServer(sourceFilePath, CompareType.SOURCE);

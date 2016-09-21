@@ -18,15 +18,19 @@ module.exports = {
     //   console.log("process.nextTick is defined when sending.");
     // }
 
+    if(this.sendQueue.length==0){
+      return;
+    }
 
-    console.log("try to send data:", data.length);
+
     try {
       var firstData = this.sendQueue[0];
+      console.log("try to send data:", firstData.length);
 
       // http://stackoverflow.com/questions/24786628/web-socket-exception-could-not-be-caught
       // workaround to solving can not catch problem
       if( self.socket && self.socket.readyState === 1){
-        this.socket.send(data);
+        this.socket.send(firstData);
         this.sendQueue.shift();
         if(this.sendQueue.length>0){
           process.nextTick(function(){
@@ -73,7 +77,8 @@ module.exports = {
     // socketName = name;
     this.socket.binaryType = "arraybuffer"; //"blob";
     this.socket.onopen = function() {
-      console.log('on open !!!');
+      console.log('on open and try to send queued data!!!');
+      self.sendData();
     };
     this.socket.onmessage = function(e) {
       console.log("get data !!!! :", e.data);

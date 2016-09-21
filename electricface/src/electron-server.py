@@ -117,8 +117,13 @@ class OpenFaceServerProtocol(WebSocketServerProtocol):
             # print("Got binary")
             return
         # print("on message, not binary")
-        raw = payload.decode('utf8')
-        msg = json.loads(raw)
+        try:
+            raw = payload.decode('utf8')
+            msg = json.loads(raw)
+        except Exception as err:
+            print(type(err))
+            print("can not decode to utf8 or json,{}".format(err))
+            return
         print("Received {} message of length {}.".format(
             msg['type'], len(raw)))
         # if msg['type'] == "ALL_STATE":
@@ -361,7 +366,7 @@ class OpenFaceServerProtocol(WebSocketServerProtocol):
         dataURL = msg['dataURL']
         imagePath = msg['imagePath']
         print(u"got handleTargetFrame:{}:".format(imagePath))
-        compareType = msg['type']
+        # compareType = msg['type']
         width = msg['width']
         height = msg['height']
         rgbFrame = self.convertDataURLtoRGB(dataURL, width, height)
@@ -383,7 +388,7 @@ class OpenFaceServerProtocol(WebSocketServerProtocol):
                     "height": height
                     # "representation": rep.tolist()
                 }
-                imagePath2 = res['imagePath']
+                # imagePath2 = res['imagePath']
                 # if not unicode, only need to use json.dumps() w/ .encode
                 self.sendMessage(json.dumps(res, ensure_ascii=False).encode('utf8'))
                 return
@@ -405,6 +410,20 @@ class OpenFaceServerProtocol(WebSocketServerProtocol):
 
         rgbFrame = self.convertDataURLtoRGB(dataURL, width, height)
         self.sourceFaceNDArray = self.getRep(rgbFrame)
+        if self.sourceFaceNDArray is not None:
+            representationStatus = True
+        else:
+            representationStatus = False
+        res = {
+            "type" : "COMPARE_SOURCE",
+            "representationStatus": representationStatus,
+            "imagePath": imagePath,
+            "width": width,
+            "height": height
+            # "representation": rep.tolist()
+        }
+        # if not unicode, only need to use json.dumps() w/ .encode
+        self.sendMessage(json.dumps(res, ensure_ascii=False).encode('utf8'))
         # self.sourceRGBFrame = rgbFrame
 
     def processFrame(self, dataURL, identity):
