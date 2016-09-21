@@ -370,6 +370,9 @@ class OpenFaceServerProtocol(WebSocketServerProtocol):
         width = msg['width']
         height = msg['height']
         rgbFrame = self.convertDataURLtoRGB(dataURL, width, height)
+
+        representationStatus = False
+        ifMatch = False
         if self.sourceFaceNDArray is not None:
             targetNDArray = self.getRep(rgbFrame)
             if targetNDArray is not None:
@@ -381,21 +384,25 @@ class OpenFaceServerProtocol(WebSocketServerProtocol):
                 if distance < 0.5:
                     print("the same face")
                     ifMatch = True
-                res = {
-                    "ifMatch": ifMatch,
-                    "imagePath": imagePath,
-                    "width": width,
-                    "height": height
-                    # "representation": rep.tolist()
-                }
-                # imagePath2 = res['imagePath']
-                # if not unicode, only need to use json.dumps() w/ .encode
-                self.sendMessage(json.dumps(res, ensure_ascii=False).encode('utf8'))
-                return
+
+                representationStatus = True
             else:
-                print("targetNDArray is none")
+                print("error, targetNDArray is none")
         else:
-            print("sourece is none when handling target files")
+            print("error, sourece is none when handling target files")
+
+        res = {
+            "type" : "COMPARE_TARGET",
+            "representationStatus": representationStatus,
+            "ifMatch": ifMatch,
+            "imagePath": imagePath,
+            "width": width,
+            "height": height
+            # "representation": rep.tolist()
+        }
+        # imagePath2 = res['imagePath']
+        # if not unicode, only need to use json.dumps() w/ .encode
+        self.sendMessage(json.dumps(res, ensure_ascii=False).encode('utf8'))
 
                 # print("Squared l2 distance between representations: {:0.3f}".format(distance))
         print("something wrong when comparing frames")

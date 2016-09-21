@@ -34,7 +34,7 @@ var imageFiles = [],
 	currentDir = '';
 
 // added by grimmer
-var sourceFilePath = null;
+var sourceFilePath = "";
 var candidateImageList = [];
 var CompareType = {
 	SOURCE: "COMPARE_SOURCE",
@@ -45,7 +45,8 @@ var MatchStatus = {
 	NOTSTART: 0,
 	STARTING: 1,
 	MATCH: 2,
-	NOTMATCH: 3
+	NOTMATCH: 3,
+	NOFACE: 4
 };
 
 // imageFile
@@ -110,10 +111,10 @@ var afterGetRepresentationOrCompare = function(data) {
 		if (data.representationStatus == false) {
 
 			alert('Can not find any face in the source image. please select again');
-
+			sourceFilePath = "";
 			return;
 		}
-		console.log("get source file representation ok !!!");
+		console.log("Res: source file representation ok !!!");
 
 		var num_Images = candidateImageList.length;
 		if (num_Images > 0) {
@@ -130,7 +131,7 @@ var afterGetRepresentationOrCompare = function(data) {
 
 		return;
 	}
-	console.log("afterCompare");
+	console.log("Res: target afterCompare");
 
 	var ifMatch = null,
 		imagePath = null;
@@ -161,7 +162,12 @@ var afterGetRepresentationOrCompare = function(data) {
 					// 	updateStatusText();
 					// }
 				} else {
+
 					imageInfo.status = MatchStatus.NOTMATCH;
+
+					if (data.representationStatus == false) {
+						imageInfo.status = MatchStatus.NOFACE;
+					}
 				}
 
 				updateStatusText();
@@ -379,7 +385,6 @@ var _loadDir = function(dir, fileName) {
 	}
 
 	//try to send by ws
-	console.log("open folder after selecting source, start to match");
 	for (var i = 0; i < num_Images; i++) {
 		var selectedImage = tmpImageList[i];
 		var imageInfo = {
@@ -393,10 +398,10 @@ var _loadDir = function(dir, fileName) {
 
 		candidateImageList.push(imageInfo);
 	}
-	console.log("open folder after selecting source, end sending all match data");
+	// console.log("open folder after selecting source, end sending all match data");
 
 	if (sourceFilePath) {
-
+		console.log("open folder after selecting source, start to match");
 	} else {
 		alert('No set source image yet');
 		return;
