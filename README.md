@@ -39,9 +39,9 @@ A cross-platform Image Viewer based on Electron. It runs on OS X, Windows and Li
 # Features
 
 - Find the matched face images. From the menu, `file->open a source file`, select a source image including 1 face. Then click 'open' of menu or click open button , to select folder/any other file. Later it will show matched images.     
-- Open a Directory and browse it's images
-- Open an Image File and browse the images inside the same directory
-- Fast navigation through the images via Left/Right keyboard buttons
+- ~~Open a Directory and browse it's images~~
+- ~~Open an Image File and browse the images inside the same directory~~
+- ~~Fast navigation through the images via Left/Right keyboard buttons~~
 - Rotate an image clockwise/anti-clockwise
 - Save/Move the image to a new location
 
