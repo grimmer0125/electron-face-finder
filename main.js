@@ -4,11 +4,21 @@
 // import {spawn} from 'child_process';
 // require('child_process').spawn()
 console.log("start");
+
+// in index:
+// dir:/Users/grimmer/git/image-viewer/app;
+// respath:/Users/grimmer/git/image-viewer/node_modules/electron-prebuilt/dist/Electron.app/Contents/Resources
+
+// dir: /Users/grimmer/git/image-viewer
+// path: /Users/grimmer/git/image-viewer/node_modules/electron-prebuilt/dist/Electron.app/Contents/Resources
+
+var projectPath = __dirname;
+
 // var needIntall = false;
 var child_process =  require('child_process');
 var sync = require('child_process').spawnSync;
 
-var checkResult = sync('sh', ["checkinstallDocker.sh"]);
+var checkResult = sync('sh', [projectPath+"/checkinstallDocker.sh"]);
 var output = checkResult.stdout.toString();
 console.log(output);
 if(output.indexOf("docker is running") >= 0){
@@ -26,20 +36,20 @@ console.log("checked docker of Mac");
 //   var output = installResult.stdout.toString();
 //   console.log(output);
 // }
-child_process.spawn('sh', ["pullimage.sh"], {});
+child_process.spawn('sh', [projectPath+"/pullimage.sh"], {});
 console.log("pulled docker image");
-
 
 if (process.env.NODE_ENV =="dev"){
   console.log("use dev");
   // child_process.spawn('sh', ["start-dev.sh"], {});
 } else {
-  child_process.spawn('sh', ["start.sh"], {});
+
+  // var prefix="/Users/grimmer/git/image-viewer";
+  child_process.spawn('sh', [projectPath+"/start.sh"], {});
 }
 
 var app = require('app');
 var BrowserWindow = require('browser-window');
-
 var mainWindow = null;
 
 var ipc = require('ipc');
@@ -69,7 +79,7 @@ app.on('ready', function() {
 
 app.on('before-quit', function() {
   console.log("before-quit");
-  child_process.spawn('sh', ["stop.sh"], {
+  child_process.spawn('sh', [projectPath+"/stop.sh"], {
    // detached: true, <-????
    // stdio: [ 'ignore', out, err ]
   });
