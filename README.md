@@ -1,7 +1,10 @@
 <!-- # How to install -->
 <!-- 1.type 'npm run prepare' -->
 
-# Currently this only tested on Mac platform. This experimental project is based on [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface) and [https://github.com/yyosifov/image-viewer](https://github.com/yyosifov/image-viewer).
+## Currently this only tested on Mac platform. This experimental project is based on [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface) and [https://github.com/yyosifov/image-viewer](https://github.com/yyosifov/image-viewer).
+
+### Known Bugs:
+1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon. 
 
 ## Install (Optional)
 
@@ -29,15 +32,15 @@ It will search all the sub-folders and consume a lot time (maybe hours, depends 
 
 - OS X:
 
-![alt tag](http://i.imgur.com/JM0GaFJ.jpg)
+![alt tag](https://grimmer.io/images/electron-dog.png)
 
-- Windows:
+<!--- Windows:-->
 
-![alt tag](http://i.imgur.com/uYsD4yy.png)
+<!--![alt tag](http://i.imgur.com/uYsD4yy.png)-->
 
-- Linux:
+<!--- Linux:-->
 
-![alt tag](http://i.imgur.com/KXlmv3o.png)
+<!--![alt tag](http://i.imgur.com/KXlmv3o.png)-->
 
 # Features
 
