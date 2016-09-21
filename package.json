@@ -21,7 +21,7 @@
     "clean": "rm -rf ./dist",
     "clean:osx": "rm -rf ./dist/osx",
     "build": "npm run clean && npm run build:osx",
-    "build:osx": "npm run clean:osx && electron-packager . --out=dist/osx --platform=darwin --arch=x64",
+    "build:osx": "npm run clean:osx && electron-packager . --out=dist/osx --platform=darwin --arch=x64"
   },
   "author": "",
   "license": "ISC"
