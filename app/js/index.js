@@ -287,7 +287,28 @@ function testArrayBufferJSON(imageFile) {
 
 }
 
+// function testGetAllFiles(dir) {
+
+// function getSubDirectories(srcpath) {
+// 	return fs.readdirSync(srcpath).filter(function(file) {
+// 		return fs.statSync(path.join(srcpath, file)).isDirectory();
+// 	});
+// }
+
+// 	var result = getSubDirectories(dir);
+// 	console.log("result:", result);
+// 	debugger;
+// }
+
+
 var _loadDir = function(dir, fileName) {
+	// console.log("1");
+	// // testGetAllFiles(dir);
+	// var tmpImageList2 = fileSystem.getAllImageFiles(dir);
+	//
+	// console.log("2");
+	//
+	// return;
 
 	imageFiles = [];
 	candidateImageList = [];
@@ -299,8 +320,7 @@ var _loadDir = function(dir, fileName) {
 	// }
 
 	currentDir = dir;
-	// imageFiles = fileSystem.getDirectoryImageFiles(dir);
-	var tmpImageList = fileSystem.getDirectoryImageFiles(dir);
+	var tmpImageList = fileSystem.getAllImageFiles(dir);
 	console.log("get candidate image files:", imageFiles);
 
 	var num_Images = tmpImageList.length;
