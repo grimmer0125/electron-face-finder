@@ -18,9 +18,12 @@
 1. type `npm run dev`
 2. open another terminal. type `sh start-dev.sh`
 
-# Image Viewer
+# Face Finder/Matcher
 
-A cross-platform Image Viewer based on Electron. It runs on OS X, Windows and Linux. It provides an easy interface to browse a directory of images using the left and right keyboard buttons.
+A cross-platform Face Matcher based on Electron. It runs on OS X, Windows and Linux. It provides an easy interface to browse a directory of images using the left and right keyboard buttons.
+
+### Caution 
+It will search all the sub-folders and consume a lot time (maybe hours, depends on the number of image files). The UI does not have any progress bar, please keep in mind. Also the UI is not optimized and it may have bugs. 
 
 # Preview
 
