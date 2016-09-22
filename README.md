@@ -1,17 +1,18 @@
-## Currently this is only tested on Mac platform. This experimental project is based on the following projects. 
+## Currently this is only tested on Mac platform. This experimental project is based on the following projects.
 1. [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface),Apache 2.0 License. Modify its Dockerfile.
 2. [https://github.com/yyosifov/image-viewer](https://github.com/yyosifov/image-viewer),  ISC License. Most of UI are from it.
 
 ### Known Issues:
-1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon. 
+1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon.
+2. Slow python WebSocker in Docker. Need to debug it. 
 
 ### Todo list
-1. add source/targetImage info in the ack packet from server. It is to handle interrupt case. E.g. Change target/source when the process is not finished. 
-2. stop button. 
+1. add source/targetImage info in the ack packet from server. It is to handle interrupt case. E.g. Change target/source when the process is not finished.
+2. stop button.
 
 ### Install dependencies before running locally
 1. Install Docker of Mac if you do not have. Type `sh checkinstallDocker.sh` to install it. Or you can download it from [https://www.docker.com](https://www.docker.com) and then install it.
-2. After installing it, type `docker pull grimmer0125/openface-nostartdemo` to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the docker image and install. 
+2. After installing it, type `docker pull grimmer0125/openface-nostartdemo` to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the docker image and install.
 
 ## How to Run locally
 
@@ -19,7 +20,7 @@
 1. type `npm start` in terminal. But this way does not have any terminal logs of server side, you need to use [kinematic](https://kitematic.com/) to monitor the server logs from Docker. Or use shell script to attach/exec into the Docker.  
 
 ### method 2- Run with monitor server logs directly
-1. type `make run` in terminal. In this way, you can see server logs. But you can not use ctrl+c to close Electron-UI app. You need to close it inside Electron app. 
+1. type `make run` in terminal. In this way, you can see server logs. But you can not use ctrl+c to close Electron-UI app. You need to close it inside Electron app.
 
 ## You can download the packaged binary from here:
 
@@ -27,7 +28,7 @@
 
 A cross-platform Face Matcher based on Electron. It runs on OS X, Windows and Linux. It provides an easy interface to browse a directory of images using the left and right keyboard buttons.
 
-### Caution 
+### Caution
 1. It will search all the sub-folders and consume a lot time (1 file-1MB consumes 5s).
 
 # Preview
@@ -52,4 +53,3 @@ A cross-platform Face Matcher based on Electron. It runs on OS X, Windows and Li
 - ~~Fast navigation through the images via Left/Right keyboard buttons~~
 - ~~Rotate an image clockwise/anti-clockwise~~
 - Save/Move the image to a new location
-

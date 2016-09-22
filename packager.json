@@ -1,7 +1,7 @@
 {
   "osx": {
     "title": "FaceFinder",
-    "background": "assets/osx/background.png",
+    "background": "assets/osx/installerBG.png",
     "icon": "assets/osx/icon.icns",
     "icon-size": 80,
 
@@ -15,9 +15,5 @@
       "y": 344,
       "type": "file"
     }]
-  },
-  "win": {
-    "title": "FaceFinder",
-    "icon": "assets/win/icon.ico"
   }
 }
