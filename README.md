@@ -11,14 +11,14 @@
 2. stop button.
 3. study how to debug main process when this app is as a package app.
 
-## Before run in in development environment or download a packaged app, you need Docker for Mac.
+# Before run in in development environment or download a packaged app, you need Docker for Mac.
 
 Type `sh checkinstallDocker.sh` to install it. Or you can download it from [https://www.docker.com/products/docker#/mac](https://www.docker.com/products/docker#/mac) and then install it.
 
-## How to Run in development environment
+# How to Run in development environment
 
 ### Install additional dependencies before running locally
-After installing it, type `docker pull grimmer0125/openface-nostartdemo` to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the docker image and install.
+After installing it, type `docker pull grimmer0125/openface-nostartdemo` to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the above docker image and install.
 
 ### Run method 1
 1. type `npm start` in terminal. But this way does not have any terminal logs of server side, you need to use [kinematic](https://kitematic.com/) to monitor the server logs from Docker. Or use shell script to attach/exec into the Docker.  
@@ -26,8 +26,13 @@ After installing it, type `docker pull grimmer0125/openface-nostartdemo` to inst
 ### Run method 2- Run with monitor server logs directly
 1. type `make run` in terminal. In this way, you can see server logs. But you can not use ctrl+c to close Electron-UI app. You need to close it inside Electron app.
 
-## Run Production packaged app:
-Download it form here. 
+# Run Production packaged app:
+
+### Install additional dependencies before running locally
+After installing it, type `docker pull grimmer0125/electricface` to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the docker image and install.
+
+### Download the distributed binary packaged Electron app it form here.
+[https://github.com/grimmer0125/electron-face-finder/releases](https://github.com/grimmer0125/electron-face-finder/releases)
 
 # Face Finder/Matcher
 
@@ -52,9 +57,9 @@ A cross-platform Face Matcher based on Electron. It runs on OS X, Windows and Li
 
 # Features
 
-- Find the matched face images. From the menu, `file->open a source file`, select a source image including 1 face. Then click 'open' of menu or click open button , to select folder/any other file. Later it will show matched images.     
+- Find the matched face images. From the menu, `file->open a source file`, select a source image including 1 face. Then click 'open' of menu or click open button , to select folder/any other file. Later it will show matched images having the same face.    
 - ~~Open a Directory and browse it's images~~
 - ~~Open an Image File and browse the images inside the same directory~~
-- ~~Fast navigation through the images via Left/Right keyboard buttons~~
-- ~~Rotate an image clockwise/anti-clockwise~~
+- Fast navigation through the images via Left/Right keyboard buttons
+- Rotate an image clockwise/anti-clockwise
 - Save/Move the image to a new location
