@@ -20,7 +20,7 @@
     "start": "NODE_ENV=dev electron .",
     "clean": "rm -rf ./dist",
     "clean:osx": "rm -rf ./dist/osx",
-    "build-osx": "npm run clean:osx && electron-packager . \"FaceFinder\" --out=dist/osx --platform=darwin --arch=x64 --version=0.31.0 --icon=assets/osx/icon.icns",
+    "build-osx": "npm run clean:osx && electron-packager . \"FaceFinder\" --out=dist/osx --platform=darwin --arch=x64 --version=0.31.0 --icon=assets/osx/electron-dog.icns",
     "pack-osx": "npm run build-osx && electron-builder \"dist/osx/FaceFinder-darwin-x64/FaceFinder.app\" --platform=osx --out=\"dist/osx\"  --config=packager.json"
   },
   "author": "",

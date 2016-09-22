@@ -2,8 +2,8 @@
   "osx": {
     "title": "FaceFinder",
     "background": "assets/osx/installerBG.png",
-    "icon": "assets/osx/icon.icns",
-    "icon-size": 128,
+    "icon": "assets/osx/electron-dog.icns",
+    "icon-size": 80,
 
     "contents": [{
       "x": 438,
