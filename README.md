@@ -29,7 +29,7 @@ After installing it, type `docker pull grimmer0125/openface-nostartdemo` to inst
 # Run Production packaged app:
 
 ### Install additional dependencies before running locally
-After installing it, type `docker pull grimmer0125/electricface` to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the docker image (**electricface**) and install.
+After installing it, type `docker pull grimmer0125/electricface`(web:[https://hub.docker.com/r/grimmer0125/electricface/](https://hub.docker.com/r/grimmer0125/electricface/)) to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the docker image (**electricface**) and install.
 
 ### Download the distributed binary packaged Electron app, FaceFinder.dmg form here.
 [http://goo.gl/GsNWJe](http://goo.gl/GsNWJe)
