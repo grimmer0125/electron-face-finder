@@ -49,11 +49,6 @@ var MatchStatus = {
 	NOFACE: 4
 };
 
-// imageFile
-// name:
-// 	imgObj:
-
-
 var toggleButtons = function(hasSelectedImage) {
 	// disable buttons?
 	if (hasSelectedImage) {

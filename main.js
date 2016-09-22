@@ -28,6 +28,8 @@ var child_process =  require('child_process');
 // child_process.spawn('sh', [projectPath+"/pullimage.sh"], {});
 // console.log("pulled docker image");
 
+var runProductMode = false;
+
 if (process.env.NODE_ENV =="debug"){
   console.log("use debug");
   // child_process.spawn('sh', ["start-dev.sh"], {});
@@ -37,6 +39,7 @@ if (process.env.NODE_ENV =="debug"){
   console.log("start dev script:", startScriptPath);
   child_process.spawn('sh', [startScriptPath], {});
 } else {
+  runProductMode = true;
   var startScriptPath = projectPath+"/scripts/docker-start.sh";
   console.log("start script:", startScriptPath);
   child_process.spawn('sh', [startScriptPath], {});
@@ -68,7 +71,9 @@ app.on('ready', function() {
     mainWindow.loadUrl('file://' + __dirname + '/app/index.html');
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    if (runProductMode == false){
+      mainWindow.webContents.openDevTools();
+    }
 });
 
 app.on('before-quit', function() {
