@@ -32,7 +32,7 @@ After installing it, type `docker pull grimmer0125/openface-nostartdemo` to inst
 After installing it, type `docker pull grimmer0125/electricface` to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the docker image and install.
 
 ### Download the distributed binary packaged Electron app it form here.
-[https://github.com/grimmer0125/electron-face-finder/releases](https://github.com/grimmer0125/electron-face-finder/releases)
+[https://github.com/grimmer0125/electron-face-finder/releases/download/v0.1/FaceFinder.dmg](https://github.com/grimmer0125/electron-face-finder/releases/download/v0.1/FaceFinder.dmg)
 
 # Face Finder/Matcher
 
