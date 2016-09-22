@@ -4,8 +4,11 @@ var path = require('path');
 var constants = require('./constants');
 var remote = require('remote');
 var Menu = remote.require('menu');
+const MenuItem = remote.require('menu-item')
 var dialog = remote.require('dialog');
 var ipc = require('ipc'); // used for close-window and other commands
+
+let rightClickPosition = null
 
 //http://stackoverflow.com/questions/11293857/fastest-way-to-copy-file-in-node-js
 function copyFile(source, target, cb) {
@@ -232,6 +235,20 @@ module.exports = {
 
 		var template = this.getMenuTemplate();
 		var menu = Menu.buildFromTemplate(template);
+
+    const menuItem = new MenuItem({
+      label: 'Inspect Element',
+      click: function(){
+        remote.getCurrentWindow().inspectElement(rightClickPosition.x, rightClickPosition.y);
+      }
+    })
+    menu.append(menuItem)
+
+    window.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      rightClickPosition = {x: e.x, y: e.y};
+      menu.popup(remote.getCurrentWindow());
+    }, false)
 
 		Menu.setApplicationMenu(menu);
 	}

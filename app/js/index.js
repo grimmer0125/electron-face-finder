@@ -13,8 +13,11 @@ var constants = require('./js/constants');
 var client = require('./js/ws-client');
 client.createSocket();
 
-// for testing
-var getPixels = require("get-pixels")
+// for debugging
+if (process.env.NODE_ENV == "debug" || process.env.NODE_ENV == "dev"){
+	console.log("require getpixels");
+	var getPixels = require("get-pixels")
+}
 
 // jquery selectors
 var $currentImage = $('#currentImage'),
@@ -40,7 +43,6 @@ var CompareType = {
 	SOURCE: "COMPARE_SOURCE",
 	TARGET: "COMPARE_TARGET"
 };
-
 var MatchStatus = {
 	NOTSTART: 0,
 	STARTING: 1,
@@ -64,17 +66,13 @@ var toggleButtons = function(hasSelectedImage) {
 
 function resetAllImagesStatus() {
 
-	var count = 0;
 	var len = candidateImageList.length;
 	for (var i = 0; i < len; i++) {
 		var imageInfo = candidateImageList[i];
 		imageInfo.status = MatchStatus.STARTING;
-		// if (imageInfo.status == MatchStatus.STARTING) {
-		// 	count++;
-		// }
 	}
 
-	return count;
+	return;
 }
 
 function countHandlingImages() {
@@ -93,13 +91,7 @@ function countHandlingImages() {
 
 var afterGetRepresentationOrCompare = function(data) {
 
-	console.log("afterGetRepresentationOrCompare:", data);
-	// if (data.hasOwnProperty("type")) {
-	//
-	// 	if (data.type == CompareType.SOURCE) {
-	// 		console.log("abc");
-	// 	}
-	// }
+	console.log("Response, either Source or Target:", data);
 
 	if (data.hasOwnProperty("type") && data.type == CompareType.SOURCE) {
 
@@ -121,7 +113,6 @@ var afterGetRepresentationOrCompare = function(data) {
 			}
 			console.log(
 				"open folder before selecting source, end sending all match data");
-
 		}
 
 		return;
@@ -153,9 +144,9 @@ var afterGetRepresentationOrCompare = function(data) {
 						console.log('to show image !!!');
 						showImage(selectedImageIndex);
 					}
-					// else {
-					// 	updateStatusText();
-					// }
+					else {
+						updateStatusText();
+					}
 				} else {
 
 					imageInfo.status = MatchStatus.NOTMATCH;
@@ -163,9 +154,9 @@ var afterGetRepresentationOrCompare = function(data) {
 					if (data.representationStatus == false) {
 						imageInfo.status = MatchStatus.NOFACE;
 					}
-				}
 
-				updateStatusText();
+					updateStatusText();
+				}
 
 				return;
 			}
@@ -180,7 +171,6 @@ var getImageThenSendToServer = function(imagePath, type) {
 	var t1 = new Date().getTime();
 
 	var imageObj = new Image();
-	// imageObj.src = imageFiles[index];
 	imageObj.src = imagePath;
 
 	imageObj.onload = function() {
@@ -188,13 +178,13 @@ var getImageThenSendToServer = function(imagePath, type) {
 		var t2 = new Date().getTime();
 		console.log("loading consumes:", (t2 - t1));
 
-		//var imageObj = document.getElementById("currentImage");
 		// var imageObj = $currentImage[0];
 		var canvas = document.createElement('canvas');
 		canvas.width = imageObj.width;
 		canvas.height = imageObj.height;
 		var context = canvas.getContext('2d');
 		context.drawImage(imageObj, 0, 0);
+
 		// var imageData = context.getImageData(0, 0, imageObj.width, imageObj.height);
 		// console.log('imageData:', imageData);
 
@@ -217,8 +207,6 @@ var getImageThenSendToServer = function(imagePath, type) {
 
 }
 
-
-
 function updateStatusText() {
 	var index = imageFiles.indexOf(currentImageFile);
 	var statsText = (index + 1) + 'th/' + imageFiles.length +
@@ -226,12 +214,6 @@ function updateStatusText() {
 		countHandlingImages() + "(Handling)";
 	$directoryStats.text(statsText);
 }
-// var increaseCount = function() {
-// 	var index = imageFiles.indexOf(currentImageFile);
-//
-// 	var statsText = (index + 1) + ' / ' + imageFiles.length;
-// 	$directoryStats.text(statsText);
-// }
 
 // Shows an image on the page.
 var showImage = function(index) {
@@ -243,10 +225,6 @@ var showImage = function(index) {
 	var imageObj = new Image();
 	imageObj.src = imageFiles[index]; //'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
 	imageObj.onload = function() {
-
-		// var grimmer2 = new Date().getTime();
-		// var v2 = grimmer2 - grimmer1;
-		// console.log("loading consumes:", v2);
 
 		$currentImage[0].src = imageObj.src;
 		// $currentImage.attr('src', imageFiles[index]).load(function() {
@@ -334,38 +312,18 @@ function testArrayBufferJSON(imageFile) {
 
 }
 
-// function testGetAllFiles(dir) {
-
-// function getSubDirectories(srcpath) {
-// 	return fs.readdirSync(srcpath).filter(function(file) {
-// 		return fs.statSync(path.join(srcpath, file)).isDirectory();
-// 	});
-// }
-
-// 	var result = getSubDirectories(dir);
-// 	console.log("result:", result);
-// 	debugger;
-// }
-
-
 var _loadDir = function(dir, fileName) {
-	// console.log("1");
-	// // testGetAllFiles(dir);
-	// var tmpImageList2 = fileSystem.getAllImageFiles(dir);
-	//
-	// console.log("2");
-	//
-	// return;
-	currentImageFile = '';
-	imageFiles = [];
-	candidateImageList = [];
-	updateStatusText();
 
 	// for testing
 	// if (true) {
 	// 	testArrayBufferJSON(fileName);
 	// 	return;
 	// }
+
+	currentImageFile = '';
+	imageFiles = [];
+	candidateImageList = [];
+	updateStatusText();
 
 	currentDir = dir;
 	var tmpImageList = fileSystem.getAllImageFiles(dir);
@@ -404,29 +362,18 @@ var _loadDir = function(dir, fileName) {
 }
 
 var onOpenSource = function(filePath) {
-	//renderer
-	console.log('open Source and send to server');
-	console.log("clear previous imageFiles");
+	//renderer process
+	console.log('open Source and send to server, clear previous imageFiles');
+
 	imageFiles = [];
 	currentImageFile = '';
 	resetAllImagesStatus();
 	updateStatusText();
 	sourceFilePath = filePath + '';
 
-	// var imageObj = new Image();
-	// imageObj.src = filePath;
-	$sourceImage[0].src = filePath; //imageObj.src;
-	// $currentImage.attr('src', imageFiles[index]).load(function() {
+	$sourceImage[0].src = filePath;
 
 	getImageThenSendToServer(sourceFilePath, CompareType.SOURCE);
-
-	// filePath = filePath + ''; // convert to string
-	// var stat = fs.lstatSync(filePath);
-	// if (stat.isDirectory()) {
-	// 	onDirOpen(filePath);
-	// } else {
-	// 	onFileOpen(filePath);
-	// }
 };
 
 var onOpen = function(filePath) {
@@ -452,7 +399,7 @@ var onDirOpen = function(dir) {
 };
 
 var onFileDelete = function() {
-	return;
+
 	// file has been deleted, show previous or next...
 	var index = imageFiles.indexOf(currentImageFile);
 	if (index > -1) {

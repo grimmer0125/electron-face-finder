@@ -14,10 +14,6 @@ module.exports = {
     }
     var self = this;
 
-    // if(process && process.nextTick){
-    //   console.log("process.nextTick is defined when sending.");
-    // }
-
     if(this.sendQueue.length==0){
       return;
     }
@@ -76,7 +72,6 @@ module.exports = {
 
     console.log("after creating");
 
-    // socketName = name;
     this.socket.binaryType = "arraybuffer"; //"blob";
     this.socket.onopen = function() {
       console.log('on open and try to send queued data!!!');
@@ -84,7 +79,6 @@ module.exports = {
     };
     this.socket.onmessage = function(e) {
       console.log("get data !!!! :", e.data);
-      // debugger;
       var data = JSON.parse(e.data);
       self.receiveHandler(data);
     };

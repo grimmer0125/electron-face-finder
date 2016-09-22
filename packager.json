@@ -3,7 +3,7 @@
     "title": "FaceFinder",
     "background": "assets/osx/installerBG.png",
     "icon": "assets/osx/icon.icns",
-    "icon-size": 80,
+    "icon-size": 128,
 
     "contents": [{
       "x": 438,
