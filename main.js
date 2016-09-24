@@ -1,5 +1,7 @@
 'use strict';
 
+// console.log(process.env.PATH);
+
 var shellPath = process.env.SHELL;
 var projectPath = __dirname;
 var child_process =  require('child_process');
@@ -55,8 +57,8 @@ app.on('ready', function() {
     mainWindow = new BrowserWindow({
         //frame: false,
         resizable: true,
-        height: 600,
-        width: 800
+        height: 768,
+        width: 1024
     });
 
     mainWindow.loadUrl('file://' + __dirname + '/app/index.html');
@@ -65,6 +67,8 @@ app.on('ready', function() {
       // Open the DevTools.
       mainWindow.webContents.openDevTools();
     }
+
+    // mainWindow.maximize()
 });
 
 app.on('before-quit', function() {

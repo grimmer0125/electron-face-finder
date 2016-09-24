@@ -80,7 +80,7 @@ function resetAllImagesStatus() {
 	var len = handlingImageList.length;
 	for (var i=0; i<len; i++){
 		var imageInfo = handlingImageList[i];
-		waittingImageList.push((imageInfo.imagePath);
+		waittingImageList.push(imageInfo.imagePath);
 	}
 
 	// step2:
@@ -94,27 +94,30 @@ function updateStatusText() {
 	var currentImage = (index + 1);
 	var totalMatched = imageFiles.length;
 	var totalFiles = (waittingImageList.length+handlingImageList.length);
-
+	var totalHandled = countHandledImages();
 	//handling includes failed
 	var totalHandling = handlingImageList.length;
 
-	var statsText = currentImage + 'th/' +
-	                totalMatched +"(matched)" + "/" +
-									totalFiles + "(total)/" +
-		          totalHandling + "(Handling)";
+	var statsText = "Matched: "+ currentImage + 'th/' +
+	                totalMatched +". Total: " +  +
+									totalFiles + ". Handled: " +
+		          totalHandled + "";
 	$directoryStats.text(statsText);
 }
 
-// function countHandlingImages() {
-//
-// 	var count = 0;
-// 	var len = waittingImageList.length;
-// 	for (var i = 0; i < len; i++) {
-// 		var imageInfo = waittingImageList[i];
-// 		if (imageInfo.status == MatchStatus.STARTING) {
-// 			count++;
-// 		}
-// 	}
+function countHandledImages() {
+
+	var count = 0;
+	var len = handlingImageList.length;
+	for (var i = 0; i < len; i++) {
+		var imageInfo = handlingImageList[i];
+		if (imageInfo.status != MatchStatus.STARTING) {
+			count++;
+		}
+	}
+
+	return count;
+}
 //
 // 	//                    MatchStatus.STARTING
 // 	// imageInfo.status = MatchStatus.NOTMATCH;
@@ -205,7 +208,7 @@ function receiveTargetImageInfo(data){
 
 function imageInfoReceiver(data) {
 
-	if (data.hasOwnProperty("type")==false || data.hasOwnProperty("type")) {
+	if (data.hasOwnProperty("type")==false) {
 
 		console.log("Res: type property is missing !!!");
 		return;
@@ -224,7 +227,7 @@ client.registerReceiveHandler(imageInfoReceiver);
 
 function getImageThenSendToServer(imagePath, type) {
 
-	console.log("get image then send to server,type:%s;%s", type, imagePath);
+	// console.log("get image then send to server,type:%s;%s", type, imagePath);
 	var t1 = new Date().getTime();
 
 	var imageObj = new Image();
@@ -233,7 +236,6 @@ function getImageThenSendToServer(imagePath, type) {
 	imageObj.onload = function() {
 
 		var t2 = new Date().getTime();
-		console.log("loading consumes:%s;path:%s", (t2 - t1),imageObj.src);
 
 		// var imageObj = $currentImage[0];
 		var canvas = document.createElement('canvas');
@@ -247,8 +249,8 @@ function getImageThenSendToServer(imagePath, type) {
 
 		var dataURL = canvas.toDataURL('image/jpeg', 0.5)
 		var t3 = new Date().getTime();
-		console.log("image obj -> canvas -> jpeg.", (t3 - t2));
-		console.log('path:%s;image width:%s', imagePath, imageObj.width);
+		console.log('Image:%s. Width:%s,height:%s', imagePath, imageObj.width, imageObj.height);
+		console.log("file ->image:%s;image obj -> jpeg:%s", (t2 - t1), (t3 - t2));
 
 		var data = {
 			imagePath: imagePath,
@@ -260,9 +262,11 @@ function getImageThenSendToServer(imagePath, type) {
 
 		client.sendData(JSON.stringify(data));
 
-		getNextImageToHandle();
+		if (type == CompareType.TARGET) {
+			console.log("load target image ok and continue");
+			getNextImageToHandle();
+		}
 	};
-
 }
 
 function getNextImageToHandle(){
