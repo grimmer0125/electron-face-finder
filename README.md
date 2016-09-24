@@ -25,6 +25,8 @@ Type `sh checkinstallDocker.sh` to install it. Or you can download it from [http
 ### Install additional dependencies before running locally
 After installing it, type `docker pull grimmer0125/openface-nostartdemo` to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the above docker image (**openface-nostartdemo**) and install.
 
+#### then type `npm install` to install NPM packages. 
+
 ### Run method 1
 1. type `npm start` in terminal. But this way does not have any terminal logs of server side, you need to use [kinematic](https://kitematic.com/) to monitor the server logs from Docker. Or use shell script to attach/exec into the Docker.  
 
