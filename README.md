@@ -5,8 +5,10 @@
 ### Known Issues:
 1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon.
 2. Slow python WebSocker in Docker. Need to debug it.
-3. ~~If the folder contain too many images(may hundred of files), "out of memory" will happen and throw exception, net::ERR_INSUFFICIENT_RESOURCES.~~
-4. ~~Need to hanle the exception due to the symbolic link of a file.~~
+3. cpu usage is too high. 
+4. sometimes html image object will load an image file in a wrong way. Such as rotating a 90/180 degree somehow. 
+5. ~~If the folder contain too many images(may hundred of files), "out of memory" will happen and throw exception, net::ERR_INSUFFICIENT_RESOURCES.~~
+6. ~~Need to hanle the exception due to the symbolic link of a file.~~
 
 ### Todo list
 1. add source/targetImage info in the ack packet from server. It is to handle interrupt case. E.g. Change target/source when the process is not finished.
@@ -15,6 +17,7 @@
 4. Add connecting indicator to blow UI operation.
 5. Clean the sending queue when reseting
 6. Add Mac app signing. 
+7. try to support the image path having "%"
 
 # Before run in in development environment or download a packaged app, you need Docker for Mac.
 
