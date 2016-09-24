@@ -38,7 +38,7 @@ var imageFiles = [],
 
 // added by grimmer
 var sourceFilePath = "";
-var candidateImageList = [];
+var waittingImageList = [];
 var handlingImageList = [];
 var CompareType = {
 	SOURCE: "COMPARE_SOURCE",
@@ -49,92 +49,113 @@ var MatchStatus = {
 	STARTING: 1,
 	MATCH: 2,
 	NOTMATCH: 3,
-	NOFACE: 4
+	NOFACE: 4,
+	LOADFAIL:5
 };
 
-var toggleButtons = function(hasSelectedImage) {
-	// disable buttons?
-	if (hasSelectedImage) {
-		$openFile.hide();
-		$currentImage.show();
-		$controlPanel.show();
-	} else {
-		$openFile.show();
-		$currentImage.hide();
-		$controlPanel.hide();
-	}
-};
+function resetWhenGetNoFaceSourceInfo(){
+	sourceFilePath = "";
+}
+
+function resetAllImagesStatusWhenTarget(){
+	currentImageFile = '';
+	imageFiles = [];
+
+	// reset handling
+	// step1: copy data to waitting, no need this step
+	// step2:
+	handlingImageList = [];
+
+	// reset total
+	waittingImageList = [];
+}
 
 function resetAllImagesStatus() {
 
-	var len = candidateImageList.length;
-	for (var i = 0; i < len; i++) {
-		var imageInfo = candidateImageList[i];
-		imageInfo.status = MatchStatus.STARTING;
+	currentImageFile = '';
+	imageFiles = [];
+
+	// reset handling
+	// step1: copy data to waitting
+	var len = handlingImageList.length;
+	for (var i=0; i<len; i++){
+		var imageInfo = handlingImageList[i];
+		waittingImageList.push((imageInfo.imagePath);
 	}
+
+	// step2:
+	handlingImageList = [];
 
 	return;
 }
 
-function countHandlingImages() {
+function updateStatusText() {
+	var index = imageFiles.indexOf(currentImageFile);
+	var currentImage = (index + 1);
+	var totalMatched = imageFiles.length;
+	var totalFiles = (waittingImageList.length+handlingImageList.length);
 
-	var count = 0;
-	var len = candidateImageList.length;
-	for (var i = 0; i < len; i++) {
-		var imageInfo = candidateImageList[i];
-		if (imageInfo.status == MatchStatus.STARTING) {
-			count++;
-		}
-	}
+	//handling includes failed
+	var totalHandling = handlingImageList.length;
 
-	//                    MatchStatus.STARTING
-	// imageInfo.status = MatchStatus.NOTMATCH;
-	// imageInfo.status = MatchStatus.NOFACE;
-
-	return count;
+	var statsText = currentImage + 'th/' +
+	                totalMatched +"(matched)" + "/" +
+									totalFiles + "(total)/" +
+		          totalHandling + "(Handling)";
+	$directoryStats.text(statsText);
 }
 
+// function countHandlingImages() {
+//
+// 	var count = 0;
+// 	var len = waittingImageList.length;
+// 	for (var i = 0; i < len; i++) {
+// 		var imageInfo = waittingImageList[i];
+// 		if (imageInfo.status == MatchStatus.STARTING) {
+// 			count++;
+// 		}
+// 	}
+//
+// 	//                    MatchStatus.STARTING
+// 	// imageInfo.status = MatchStatus.NOTMATCH;
+// 	// imageInfo.status = MatchStatus.NOFACE;
+//
+// 	return count;
+// }
 
-function sourceImageReceiver(data){
+
+function receiveSourceImageInfo(data){
 	// if (data.hasOwnProperty("type") && data.type == CompareType.SOURCE) {
 
-	console.log("Res: source file!!");
+	console.log("Res: source info!!");
 
 	if (data.representationStatus == false) {
+		console.log("Res: source representation info fail!!!");
 
 		alert('Can not find any face in the source image. please select again');
-		sourceFilePath = "";
+		resetWhenGetNoFaceSourceInfo();
 		return;
 	}
-	console.log("Res: source file representation ok !!!");
 
-	var num_Images = candidateImageList.length;
-	if (num_Images > 0) {
-		console.log("open folder before selecting source, start to match");
-		for (var i = 0; i < num_Images; i++) {
-			var selectedImageInfo = candidateImageList[i];
-			getImageThenSendToServer(selectedImageInfo.imagePath, CompareType.TARGET);
-			selectedImageInfo.status = MatchStatus.STARTING;
-		}
-		console.log(
-			"open folder before selecting source, end sending all match data");
-	}
+
+	console.log("selected source, now start to match");
+	getNextImageToHandle();
+
+	// var num_Images = waittingImageList.length;
+	// if (num_Images > 0) {
+
+		// 理論上如果server是非同步, 那不一定, 但應該實際上會是這樣沒錯, 不然就是選到空的folder
+
+		// for (var i = 0; i < num_Images; i++) {
+		// 	var selectedImageInfo = waittingImageList[i];
+		// 	getImageThenSendToServer(selectedImageInfo.imagePath, CompareType.TARGET);
+		// 	selectedImageInfo.status = MatchStatus.STARTING;
+		// }
+		// console.log("open folder before selecting source, end sending all match data");
+	// }
 }
 
-var imageInfoReceiver = function(data) {
-
-	if (data.hasOwnProperty("type")==false || data.hasOwnProperty("type")) {
-
-		console.log("Res: type property is missing !!!");
-		return;
-	}
-
-	if(data.type == CompareType.SOURCE){
-		sourceImageReceiver(data);
-		return;
-	}
-
-	console.log("Res: target afterCompare");
+function receiveTargetImageInfo(data){
 
 	var ifMatch = null,
 		imagePath = null;
@@ -146,9 +167,9 @@ var imageInfoReceiver = function(data) {
 	}
 
 	if (ifMatch !== null && imagePath != null) {
-		var len = candidateImageList.length;
+		var len = handlingImageList.length;
 		for (var i = 0; i < len; i++) {
-			var imageInfo = candidateImageList[i];
+			var imageInfo = handlingImageList[i];
 			if (imageInfo.imagePath == imagePath) {
 
 				// match時一定會讓 matched +1 / total / handling
@@ -181,9 +202,27 @@ var imageInfoReceiver = function(data) {
 		}
 	}
 }
+
+function imageInfoReceiver(data) {
+
+	if (data.hasOwnProperty("type")==false || data.hasOwnProperty("type")) {
+
+		console.log("Res: type property is missing !!!");
+		return;
+	}
+
+	if(data.type == CompareType.SOURCE){
+		receiveSourceImageInfo(data);
+		return;
+	}
+
+	console.log("Res: target afterCompare");
+
+	receiveTargetImageInfo(data);
+}
 client.registerReceiveHandler(imageInfoReceiver);
 
-var getImageThenSendToServer = function(imagePath, type) {
+function getImageThenSendToServer(imagePath, type) {
 
 	console.log("get image then send to server,type:%s;%s", type, imagePath);
 	var t1 = new Date().getTime();
@@ -206,7 +245,6 @@ var getImageThenSendToServer = function(imagePath, type) {
 		// var imageData = context.getImageData(0, 0, imageObj.width, imageObj.height);
 		// console.log('imageData:', imageData);
 
-		//encoding jpeg and base64, can use this https://www.npmjs.com/package/get-pixels later
 		var dataURL = canvas.toDataURL('image/jpeg', 0.5)
 		var t3 = new Date().getTime();
 		console.log("image obj -> canvas -> jpeg.", (t3 - t2));
@@ -221,20 +259,31 @@ var getImageThenSendToServer = function(imagePath, type) {
 		};
 
 		client.sendData(JSON.stringify(data));
+
+		getNextImageToHandle();
 	};
 
 }
 
-function updateStatusText() {
-	var index = imageFiles.indexOf(currentImageFile);
-	var statsText = (index + 1) + 'th/' + imageFiles.length +
-		"(matched)" + "/" + candidateImageList.length + "(total)/" +
-		countHandlingImages() + "(Handling)";
-	$directoryStats.text(statsText);
+function getNextImageToHandle(){
+	if (waittingImageList.length>0){
+
+		var selectedImage = waittingImageList[0];
+		var imageInfo = {
+			imagePath: selectedImage,
+			status: MatchStatus.STARTING
+		};
+
+		handlingImageList.push(imageInfo);
+		waittingImageList.shift();
+		getImageThenSendToServer(selectedImage, CompareType.TARGET);
+	} else {
+		console.log("waittingImageList is empty !!!")
+	}
 }
 
 // Shows an image on the page.
-var showImage = function(index) {
+function showImage(index) {
 	toggleButtons(true);
 
 	setRotateDegrees(0);
@@ -262,6 +311,20 @@ var showImage = function(index) {
 	};
 
 };
+
+var toggleButtons = function(hasSelectedImage) {
+	// disable buttons?
+	if (hasSelectedImage) {
+		$openFile.hide();
+		$currentImage.show();
+		$controlPanel.show();
+	} else {
+		$openFile.show();
+		$currentImage.hide();
+		$controlPanel.hide();
+	}
+};
+
 
 var onPreviousClick = function() {
 	var currentImageId = $currentImage.data('currentIndex');
@@ -343,9 +406,12 @@ function testArrayBufferJSON(imageFile) {
 // 方法4: 爆掉時, 再pause, 再等下一批
 
 // 看起來最好的是 方法3+try catch+ 方法4,因為如果是大量批次preview圖 也很難用方法2
+// 不過可能也同時要結合方法2....
 
 
-var _loadDir = function(dir, fileName) {
+
+
+function loadDir(dir, fileName) {
 
 	// for testing
 	// if (true) {
@@ -353,16 +419,17 @@ var _loadDir = function(dir, fileName) {
 	// 	return;
 	// }
 
-	currentImageFile = '';
-	imageFiles = [];
-	candidateImageList = [];
+	// currentImageFile = '';
+	// imageFiles = [];
+	// waittingImageList = [];
+	resetAllImagesStatusWhenTarget();
 	updateStatusText();
 
 	currentDir = dir;
-	var tmpImageList = fileSystem.getAllImageFiles(dir);
+	waittingImageList = fileSystem.getAllImageFiles(dir);
 	console.log("get candidate image files:", imageFiles);
 
-	var num_Images = tmpImageList.length;
+	var num_Images = waittingImageList.length;
 	console.log("open target folder, length:%s", num_Images);
 
 	if (num_Images == 0) {
@@ -371,26 +438,39 @@ var _loadDir = function(dir, fileName) {
 	}
 
 	//try to send by ws
-	for (var i = 0; i < num_Images; i++) {
-		var selectedImage = tmpImageList[i];
-		var imageInfo = {
-			imagePath: selectedImage
-		};
-
-		if (sourceFilePath) {
-			// console.log("loop:",i);
-			// process.nextTick(function(){
-			getImageThenSendToServer(selectedImage, CompareType.TARGET);
-			// });
-			imageInfo.status = MatchStatus.STARTING;
-		}
-
-		candidateImageList.push(imageInfo);
-	}
+	// for (var i = 0; i < num_Images; i++) {
+	// 	var selectedImage = waittingImageList[i];
+	//
+	//
+	// 	if (sourceFilePath) {
+	// 		// console.log("loop:",i);
+	// 		// process.nextTick(function(){
+	//
+	//
+	// 	}
+	//
+	// 	// waittingImageList.push(imageInfo);
+	//
+	// }
 	// console.log("open folder after selecting source, end sending all match data");
 
 	if (sourceFilePath) {
 		console.log("start to prepare images and match");
+
+		getNextImageToHandle();
+		// if (waittingImageList.length>0){
+		//
+		// 	var selectedImage = waittingImageList[0];
+		// 	var imageInfo = {
+		// 		imagePath: selectedImage,
+		// 		status: MatchStatus.STARTING
+		// 	};
+		//
+		// 	handlingImageList.push(imageInfo);
+		// 	waittingImageList.shift();
+		// 	getImageThenSendToServer(selectedImage, CompareType.TARGET);
+		// }
+
 	} else {
 		console.log("No set source image yet !!!");
 		alert('No set source image yet');
@@ -402,8 +482,8 @@ var onOpenSource = function(filePath) {
 	//renderer process
 	console.log('open Source and send to server, clear previous imageFiles');
 
-	imageFiles = [];
-	currentImageFile = '';
+	// imageFiles = [];
+	// currentImageFile = '';
 	resetAllImagesStatus();
 	updateStatusText();
 	sourceFilePath = filePath + '';
@@ -428,11 +508,11 @@ var onFileOpen = function(fileName) {
 	fileName = fileName + ''; // convert to string.
 	var dirName = path.dirname(fileName);
 
-	_loadDir(dirName, fileName);
+	loadDir(dirName, fileName);
 };
 
 var onDirOpen = function(dir) {
-	_loadDir(dir + ''); // convert to string
+	loadDir(dir + ''); // convert to string
 };
 
 var onFileDelete = function() {
