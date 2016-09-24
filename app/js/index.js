@@ -245,17 +245,17 @@ function getImageThenSendToServer(imagePath, type) {
 		}
 	};
 
-	imageObj.onabort = function() {
-		console.log("image abort:%s", imageObj);
-
-		if (type == CompareType.TARGET) {
-			console.log("load target image fail and continue");
-			getNextImageToHandle();
-		} else {
-			resetWhenGetNoFaceSourceInfo();
-			alert('source image file has error, please change');
-		}
-	};
+	// imageObj.onabort = function() {
+	// 	console.log("image abort:%s", imageObj);
+	//
+	// 	if (type == CompareType.TARGET) {
+	// 		console.log("load target image fail and continue");
+	// 		getNextImageToHandle();
+	// 	} else {
+	// 		resetWhenGetNoFaceSourceInfo();
+	// 		alert('source image file has error, please change');
+	// 	}
+	// };
 
 	imageObj.onload = function() {
 
