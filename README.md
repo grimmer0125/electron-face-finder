@@ -6,7 +6,7 @@
 1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon.
 2. Slow python WebSocker in Docker. Need to debug it.
 3. If the folder contain too many images(may hundred of files), "out of memory" will happen and throw exception, net::ERR_INSUFFICIENT_RESOURCES.
-4. Need to hanle the exception due to the symbolic link of a file.
+4. ~~Need to hanle the exception due to the symbolic link of a file.~~
 
 ### Todo list
 1. add source/targetImage info in the ack packet from server. It is to handle interrupt case. E.g. Change target/source when the process is not finished.
