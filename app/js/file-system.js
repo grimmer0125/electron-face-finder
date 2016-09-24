@@ -43,5 +43,11 @@ function getImages(dir, images){
 }
 
 function isDirectory(path){
-	return fs.statSync(path).isDirectory();
+	var answer = false;
+	try {
+		answer = fs.statSync(path).isDirectory();
+	} catch(err) {
+		console.log("some statSync err happen:", err);
+	}
+	return answer;
 }
