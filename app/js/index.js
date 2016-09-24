@@ -233,6 +233,30 @@ function getImageThenSendToServer(imagePath, type) {
 	var imageObj = new Image();
 	imageObj.src = imagePath;
 
+	imageObj.onerror = function() {
+		console.log("image error:%s", imageObj);
+
+		if (type == CompareType.TARGET) {
+			console.log("load target image fail and continue");
+			getNextImageToHandle();
+		} else {
+			resetWhenGetNoFaceSourceInfo();
+			alert('source image file has error, please change');
+		}
+	};
+
+	imageObj.onabort = function() {
+		console.log("image abort:%s", imageObj);
+
+		if (type == CompareType.TARGET) {
+			console.log("load target image fail and continue");
+			getNextImageToHandle();
+		} else {
+			resetWhenGetNoFaceSourceInfo();
+			alert('source image file has error, please change');
+		}
+	};
+
 	imageObj.onload = function() {
 
 		var t2 = new Date().getTime();
@@ -426,20 +450,20 @@ function loadDir(dir, fileName) {
 	// currentImageFile = '';
 	// imageFiles = [];
 	// waittingImageList = [];
-	resetAllImagesStatusWhenTarget();
-	updateStatusText();
 
-	currentDir = dir;
-	waittingImageList = fileSystem.getAllImageFiles(dir);
-	console.log("get candidate image files:", imageFiles);
-
-	var num_Images = waittingImageList.length;
-	console.log("open target folder, length:%s", num_Images);
-
+	var tmpList = fileSystem.getAllImageFiles(dir);
+	var num_Images = tmpList.length;
 	if (num_Images == 0) {
 		alert('No image files found in this directory.');
 		return;
 	}
+	console.log("open target folder, total candidate:%s", num_Images);
+
+	resetAllImagesStatusWhenTarget();
+
+	currentDir = dir;
+	waittingImageList = tmpList;
+	updateStatusText();
 
 	//try to send by ws
 	// for (var i = 0; i < num_Images; i++) {
