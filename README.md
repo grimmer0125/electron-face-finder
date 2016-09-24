@@ -13,7 +13,7 @@
 2. stop button.
 3. study how to debug main process when this app is as a package app.
 4. Add connecting indicator to blow UI operation.
-5. Clean the sending queue when reseting
+5. Clean the sending queue when reseting.
 
 # Before run in in development environment or download a packaged app, you need Docker for Mac.
 
