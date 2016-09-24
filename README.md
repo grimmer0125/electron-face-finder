@@ -5,13 +5,15 @@
 ### Known Issues:
 1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon.
 2. Slow python WebSocker in Docker. Need to debug it.
-3. If the folder contain too many images(may hundred of files), "out of memory" will happen and throw exception, net::ERR_INSUFFICIENT_RESOURCES.
+3. ~~If the folder contain too many images(may hundred of files), "out of memory" will happen and throw exception, net::ERR_INSUFFICIENT_RESOURCES.~~
 4. ~~Need to hanle the exception due to the symbolic link of a file.~~
 
 ### Todo list
 1. add source/targetImage info in the ack packet from server. It is to handle interrupt case. E.g. Change target/source when the process is not finished.
 2. stop button.
 3. study how to debug main process when this app is as a package app.
+4. Add connecting indicator to blow UI operation.
+5. Clean the sending queue when reseting
 
 # Before run in in development environment or download a packaged app, you need Docker for Mac.
 
@@ -48,14 +50,6 @@ A cross-platform Face Matcher based on Electron. It runs on OS X, Windows and Li
 - OS X:
 
 ![alt tag](https://grimmer.io/images/electron-dog.png)
-
-<!--- Windows:-->
-
-<!--![alt tag](http://i.imgur.com/uYsD4yy.png)-->
-
-<!--- Linux:-->
-
-<!--![alt tag](http://i.imgur.com/KXlmv3o.png)-->
 
 # Features
 
