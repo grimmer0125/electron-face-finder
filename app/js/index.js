@@ -39,6 +39,7 @@ var imageFiles = [],
 // added by grimmer
 var sourceFilePath = "";
 var candidateImageList = [];
+var handlingImageList = [];
 var CompareType = {
 	SOURCE: "COMPARE_SOURCE",
 	TARGET: "COMPARE_TARGET"
@@ -86,37 +87,53 @@ function countHandlingImages() {
 		}
 	}
 
+	//                    MatchStatus.STARTING
+	// imageInfo.status = MatchStatus.NOTMATCH;
+	// imageInfo.status = MatchStatus.NOFACE;
+
 	return count;
 }
 
-var afterGetRepresentationOrCompare = function(data) {
 
-	console.log("Response, either Source or Target:", data);
+function sourceImageReceiver(data){
+	// if (data.hasOwnProperty("type") && data.type == CompareType.SOURCE) {
 
-	if (data.hasOwnProperty("type") && data.type == CompareType.SOURCE) {
+	console.log("Res: source file!!");
 
-		if (data.representationStatus == false) {
+	if (data.representationStatus == false) {
 
-			alert('Can not find any face in the source image. please select again');
-			sourceFilePath = "";
-			return;
-		}
-		console.log("Res: source file representation ok !!!");
-
-		var num_Images = candidateImageList.length;
-		if (num_Images > 0) {
-			console.log("open folder before selecting source, start to match");
-			for (var i = 0; i < num_Images; i++) {
-				var selectedImageInfo = candidateImageList[i];
-				getImageThenSendToServer(selectedImageInfo.imagePath, CompareType.TARGET);
-				selectedImageInfo.status = MatchStatus.STARTING;
-			}
-			console.log(
-				"open folder before selecting source, end sending all match data");
-		}
-
+		alert('Can not find any face in the source image. please select again');
+		sourceFilePath = "";
 		return;
 	}
+	console.log("Res: source file representation ok !!!");
+
+	var num_Images = candidateImageList.length;
+	if (num_Images > 0) {
+		console.log("open folder before selecting source, start to match");
+		for (var i = 0; i < num_Images; i++) {
+			var selectedImageInfo = candidateImageList[i];
+			getImageThenSendToServer(selectedImageInfo.imagePath, CompareType.TARGET);
+			selectedImageInfo.status = MatchStatus.STARTING;
+		}
+		console.log(
+			"open folder before selecting source, end sending all match data");
+	}
+}
+
+var imageInfoReceiver = function(data) {
+
+	if (data.hasOwnProperty("type")==false || data.hasOwnProperty("type")) {
+
+		console.log("Res: type property is missing !!!");
+		return;
+	}
+
+	if(data.type == CompareType.SOURCE){
+		sourceImageReceiver(data);
+		return;
+	}
+
 	console.log("Res: target afterCompare");
 
 	var ifMatch = null,
@@ -134,6 +151,7 @@ var afterGetRepresentationOrCompare = function(data) {
 			var imageInfo = candidateImageList[i];
 			if (imageInfo.imagePath == imagePath) {
 
+				// match時一定會讓 matched +1 / total / handling
 				if (ifMatch) {
 					imageInfo.status = MatchStatus.MATCH;
 					imageFiles.push(imageInfo.imagePath)
@@ -163,11 +181,11 @@ var afterGetRepresentationOrCompare = function(data) {
 		}
 	}
 }
-client.registerReceiveHandler(afterGetRepresentationOrCompare);
+client.registerReceiveHandler(imageInfoReceiver);
 
 var getImageThenSendToServer = function(imagePath, type) {
 
-	console.log("get image then send to server,type:%s", type);
+	console.log("get image then send to server,type:%s;%s", type, imagePath);
 	var t1 = new Date().getTime();
 
 	var imageObj = new Image();
@@ -176,7 +194,7 @@ var getImageThenSendToServer = function(imagePath, type) {
 	imageObj.onload = function() {
 
 		var t2 = new Date().getTime();
-		console.log("loading consumes:", (t2 - t1));
+		console.log("loading consumes:%s;path:%s", (t2 - t1),imageObj.src);
 
 		// var imageObj = $currentImage[0];
 		var canvas = document.createElement('canvas');
@@ -312,6 +330,21 @@ function testArrayBufferJSON(imageFile) {
 
 }
 
+// p.s 不管那一個方法最好還是加try catch for loading images
+
+// 方法1:, 使用process.nextTick, 但說不定還是會爆掉.
+//       從 run- all, callback1, callback2改成
+// run1 -load run2 load run3 run-callback1
+
+// 方法2: 得到每一張callback後才去處理下一張, 可能會ok, 但萬一onload因為莫名的原因沒有被trigger ?
+
+// 方法3:, 預設每100張處理一次, 這樣還是有可能會爆掉?
+
+// 方法4: 爆掉時, 再pause, 再等下一批
+
+// 看起來最好的是 方法3+try catch+ 方法4,因為如果是大量批次preview圖 也很難用方法2
+
+
 var _loadDir = function(dir, fileName) {
 
 	// for testing
@@ -345,7 +378,10 @@ var _loadDir = function(dir, fileName) {
 		};
 
 		if (sourceFilePath) {
+			// console.log("loop:",i);
+			// process.nextTick(function(){
 			getImageThenSendToServer(selectedImage, CompareType.TARGET);
+			// });
 			imageInfo.status = MatchStatus.STARTING;
 		}
 
@@ -354,8 +390,9 @@ var _loadDir = function(dir, fileName) {
 	// console.log("open folder after selecting source, end sending all match data");
 
 	if (sourceFilePath) {
-		console.log("open folder after selecting source, start to match");
+		console.log("start to prepare images and match");
 	} else {
+		console.log("No set source image yet !!!");
 		alert('No set source image yet');
 		return;
 	}
