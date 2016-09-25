@@ -18,6 +18,7 @@
 5. Clean the sending queue when reseting
 6. Add Mac app signing. 
 7. try to support the image path having "%"
+8. Support mutiple faces in an image file. 
 
 # Before run in in development environment or download a packaged app, you need Docker for Mac.
 
