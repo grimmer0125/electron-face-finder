@@ -3,6 +3,11 @@
 var constants = require('./constants');
 
 module.exports = {
+	processSpecialCharacter: function(str){
+		// var str = "Visit Microsoft!";
+		var res = str.replace("%", "%25");
+		return res;
+	},
 	isSupportedImageFile: function(file) {
 		var extension = path.extname(file);
 		if(extension) {

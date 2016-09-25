@@ -3,16 +3,16 @@ var utilities = require('./utilities');
 var _ = require('lodash');
 
 module.exports = {
-	getDirectoryImageFiles: function(dir) {
-		var files = fs.readdirSync(dir);
-		var fullFilePaths = _.map(files, function(fileName) {
-			return path.join(dir, fileName);
-		});
-
-		var imageFiles = _.filter(fullFilePaths, utilities.isSupportedImageFile);
-
-		return imageFiles;
-	},
+	// getDirectoryImageFiles: function(dir) {
+	// 	var files = fs.readdirSync(dir);
+	// 	var fullFilePaths = _.map(files, function(fileName) {
+	// 		return path.join(dir, fileName);
+	// 	});
+	//
+	// 	var imageFiles = _.filter(fullFilePaths, utilities.isSupportedImageFile);
+	//
+	// 	return imageFiles;
+	// },
 	getAllImageFiles: function(dir) {
 
 		console.log('select dir:', dir);
@@ -33,7 +33,7 @@ function getImages(dir, images){
 	});
 	for (let file of fullFilePaths){
 		if(utilities.isSupportedImageFile(file)){
-			images.push(file);
+			images.push(utilities.processSpecialCharacter(file));
 			// console.log("file is image file:", file);
 		} else if (isDirectory(file)){
 			getImages(file, images);

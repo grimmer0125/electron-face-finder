@@ -1,5 +1,7 @@
 'use strict';
 
+var utilities = require('./js/utilities');
+
 var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
@@ -55,6 +57,7 @@ var MatchStatus = {
 
 function resetWhenGetNoFaceSourceInfo(){
 	sourceFilePath = "";
+	$sourceImage[0].src = null;
 }
 
 function resetAllImagesStatusWhenTarget(){
@@ -225,23 +228,24 @@ function imageInfoReceiver(data) {
 }
 client.registerReceiveHandler(imageInfoReceiver);
 
-function getImageThenSendToServer(imagePath, type) {
-
+function getImageThenSendToServer(imageInfo, type) {
+	var imagePath = imageInfo.imagePath;
 	// console.log("get image then send to server,type:%s;%s", type, imagePath);
 	var t1 = new Date().getTime();
 
 	var imageObj = new Image();
 	imageObj.src = imagePath;
-
 	imageObj.onerror = function() {
 		console.log("image error:%s", imageObj);
 
 		if (type == CompareType.TARGET) {
 			console.log("load target image fail and continue");
+			imageInfo.status = MatchStatus.LOADFAIL;
+			updateStatusText();
 			getNextImageToHandle();
 		} else {
-			resetWhenGetNoFaceSourceInfo();
-			alert('source image file has error, please change');
+			// resetWhenGetNoFaceSourceInfo();
+			alert('source image file has load error, please change');
 		}
 	};
 
@@ -256,6 +260,9 @@ function getImageThenSendToServer(imagePath, type) {
 	// 		alert('source image file has error, please change');
 	// 	}
 	// };
+
+	// var str = "Visit Microsoft!";
+  // var res = str.replace("Microsoft", "W3Schools");
 
 	imageObj.onload = function() {
 
@@ -289,14 +296,26 @@ function getImageThenSendToServer(imagePath, type) {
 		if (type == CompareType.TARGET) {
 			console.log("load target image ok and continue");
 			getNextImageToHandle();
+		} else {
+
+			// if(type == CompareType.SOURCE){
+				// imageFiles = [];
+				// currentImageFile = '';
+			resetAllImagesStatus();
+			updateStatusText();
+			sourceFilePath = imagePath;
+			$sourceImage[0].src = sourceFilePath; //.src = sourceFilePath;//why not use sourceFilePath originally? filePath;
+			// }
+
 		}
 	};
 }
 
 function getNextImageToHandle(){
 	if (waittingImageList.length>0){
-
+		console.log("get file from waittingImageList ok")
 		var selectedImage = waittingImageList[0];
+
 		var imageInfo = {
 			imagePath: selectedImage,
 			status: MatchStatus.STARTING
@@ -304,7 +323,7 @@ function getNextImageToHandle(){
 
 		handlingImageList.push(imageInfo);
 		waittingImageList.shift();
-		getImageThenSendToServer(selectedImage, CompareType.TARGET);
+		getImageThenSendToServer(imageInfo, CompareType.TARGET);
 	} else {
 		console.log("waittingImageList is empty !!!")
 	}
@@ -456,7 +475,15 @@ function loadDir(dir, fileName) {
 	if (num_Images == 0) {
 		alert('No image files found in this directory.');
 		return;
+	} else {
+
+    // 或是每次在render 時再去改?? yes
+		// for (var i=0; i<num_Images; i++){
+		// 	var imageInfo = handlingImageList[i];
+		// 	waittingImageList.push(imageInfo.imagePath);
+		// }
 	}
+
 	console.log("open target folder, total candidate:%s", num_Images);
 
 	resetAllImagesStatusWhenTarget();
@@ -510,15 +537,13 @@ var onOpenSource = function(filePath) {
 	//renderer process
 	console.log('open Source and send to server, clear previous imageFiles');
 
-	// imageFiles = [];
 	// currentImageFile = '';
-	resetAllImagesStatus();
-	updateStatusText();
-	sourceFilePath = filePath + '';
+	var imageInfo = {
+		imagePath: utilities.processSpecialCharacter((filePath + '')),
+		status: MatchStatus.STARTING
+	};
 
-	$sourceImage[0].src = filePath;
-
-	getImageThenSendToServer(sourceFilePath, CompareType.SOURCE);
+	getImageThenSendToServer(imageInfo, CompareType.SOURCE);
 };
 
 var onOpen = function(filePath) {
