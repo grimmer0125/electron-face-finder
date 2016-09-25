@@ -4,9 +4,9 @@
 
 ### Known Issues:
 1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon.
-2. Slow python WebSocker in Docker. Need to debug it.
-3. cpu usage is too high. 
-4. sometimes html image object will load an image file in a wrong way. Such as rotating a 90/180 degree somehow. 
+2. Slow python WebSocket in Docker. Need to debug it.
+3. cpu usage is too high.
+4. sometimes html image object will load an image file in a wrong way. Such as rotating a 90/180 degree somehow. It is exif issue.
 5. ~~If the folder contain too many images(may hundred of files), "out of memory" will happen and throw exception, net::ERR_INSUFFICIENT_RESOURCES.~~
 6. ~~Need to hanle the exception due to the symbolic link of a file.~~
 
@@ -14,11 +14,11 @@
 1. add source/targetImage info in the ack packet from server. It is to handle interrupt case. E.g. Change target/source when the process is not finished.
 2. stop button.
 3. study how to debug main process when this app is as a package app.
-4. Add connecting indicator to blow UI operation.
+4. Add connecting indicator to block UI operation and progress bar.
 5. Clean the sending queue when reseting
-6. Add Mac app signing. 
-7. try to support the image path having "%"
-8. Support mutiple faces in an image file. 
+6. Add Mac app signing.
+7. Support multiple faces in an image file.
+8. ~~try to support the image path having "%"~~
 
 # Before run in in development environment or download a packaged app, you need Docker for Mac.
 
@@ -29,7 +29,7 @@ Type `sh checkinstallDocker.sh` to install it. Or you can download it from [http
 ### Install additional dependencies before running locally
 After installing it, type `docker pull grimmer0125/openface-nostartdemo` to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the above docker image (**openface-nostartdemo**) and install.
 
-#### then type `npm install` to install NPM packages. 
+#### then type `npm install` to install NPM packages.
 
 ### Run method 1
 1. type `npm start` in terminal. But this way does not have any terminal logs of server side, you need to use [kinematic](https://kitematic.com/) to monitor the server logs from Docker. Or use shell script to attach/exec into the Docker.  
