@@ -19,6 +19,7 @@
 6. Add Mac app signing.
 7. Support multiple faces in an image file.
 8. ~~try to support the image path having "%"~~
+9. use readAsArrayBuffer to read a image file and send to the server instead of the current way, which adapts FILE -decoding> Image object -draw/copy> canvas -> jpeg-base64-DataURL then send. 
 
 # Before run in in development environment or download a packaged app, you need Docker for Mac.
 
