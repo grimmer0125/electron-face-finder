@@ -16,18 +16,18 @@ var client = require('./js/ws-client');
 client.createSocket();
 
 
-var dlog;
+// var //console.log;
 
 // for debugging
 if (process.env.NODE_ENV == "debug" || process.env.NODE_ENV == "dev"){
-	console.log("require getpixels");
+	//console.log("require getpixels");
 	var getPixels = require("get-pixels")
-	dlog = function(log){
-		// console.log(arguments);
-	} ;
+	// //console.log = function(log){
+		// //console.log(arguments);
+	// } ;
 }	else {
-	dlog = function(log){
-	};
+	// //console.log = function(log){
+	// };
 }
 
 
@@ -67,7 +67,8 @@ var MatchStatus = {
 	LOADFAIL:5
 };
 var t1, t2, t3;
-var imageObj, canvas, showImageObj;
+var imageObj, canvas, showImageObj, context;
+
 
 function resetWhenGetNoFaceSourceInfo(){
 	sourceFilePath = -1;
@@ -155,10 +156,10 @@ function countHandledImages() {
 function receiveSourceImageInfo(data){
 	// if (data.hasOwnProperty("type") && data.type == CompareType.SOURCE) {
 
-	dlog("Res: source info!!");
+	//console.log("Res: source info!!");
 
 	if (data.representationStatus == false) {
-		dlog("Res: source representation info fail!!!");
+		//console.log("Res: source representation info fail!!!");
 
 		alert('Can not find any face in the source image. please select again');
 		resetWhenGetNoFaceSourceInfo();
@@ -166,7 +167,7 @@ function receiveSourceImageInfo(data){
 	}
 
 
-	dlog("selected source, now start to match");
+	//console.log("selected source, now start to match");
 	getNextImageToHandle();
 
 	// var num_Images = waittingImageList.length;
@@ -179,7 +180,7 @@ function receiveSourceImageInfo(data){
 		// 	getImageThenSendToServer(selectedImageInfo.imagePath, CompareType.TARGET);
 		// 	selectedImageInfo.status = MatchStatus.STARTING;
 		// }
-		// dlog("open folder before selecting source, end sending all match data");
+		// //console.log("open folder before selecting source, end sending all match data");
 	// }
 }
 
@@ -197,6 +198,7 @@ function receiveTargetImageInfo(data){
 	if (data.hasOwnProperty("ifMatch") && data.ifMatch !== null &&
 	    data.hasOwnProperty("imagePath") && data.imagePath != null) {
 
+		var ifMatch = false;
 		var len = handlingImageList.length;
 		for (var i = 0; i < len; i++) {
 			var imageInfo = handlingImageList[i];
@@ -212,7 +214,7 @@ function receiveTargetImageInfo(data){
 					// try to show the image
 					if (imageFiles.length == 1) {
 						// var selectedImageIndex = 0;
-						dlog('to show image !!!');
+						//console.log('to show image !!!');
 
 						showImage(0);
 					}
@@ -230,8 +232,14 @@ function receiveTargetImageInfo(data){
 					updateStatusText();
 				}
 
-				return;
+				ifMatch = true;
+				break;
 			}
+		}
+
+		if (ifMatch) {
+			console.log("get 1 image info back and next");
+			getNextImageToHandle();
 		}
 	}
 }
@@ -240,7 +248,7 @@ function imageInfoReceiver(data) {
 
 	if (data.hasOwnProperty("type")==false) {
 
-		dlog("Res: type property is missing !!!");
+		//console.log("Res: type property is missing !!!");
 		return;
 	}
 
@@ -249,34 +257,37 @@ function imageInfoReceiver(data) {
 		return;
 	}
 
-	dlog("Res: target afterCompare");
+	//console.log("Res: target afterCompare");
 
 	receiveTargetImageInfo(data);
 }
 client.registerReceiveHandler(imageInfoReceiver);
 
 function getImageThenSendToServer(imageInfo, type) {
-	// console.log("process type0:", process.type)
+	// //console.log("process type0:", process.type)
 
 	// var imagePath = imageInfo.imagePath;
-	// dlog("get image then send to server,type:%s;%s", type, imagePath);
-	if(!t1){
-		t1 = new Date().getTime();
-	}
+	//console.log("get image then send to server,type:%s;%s", type, imageInfo.imagePath);
+	// if(!t1){
+	// 	t1 = new Date().getTime();
+	// }
 
 	if(!imageObj){
 		imageObj = new Image();
-		imageObj.onerror = handleLoadError;
-		imageObj.onload = handleLoadOK;
 	}
+
+
+	//如果是放在上面new Image(), 則type就只是第一次的值而已, 不會改
+	imageObj.onerror = handleLoadError;
+	imageObj.onload = handleLoadOK;
 
 	imageObj.src = imageInfo.imagePath;
 
 	function handleLoadError() {
-		dlog("image error:%s", imageObj);
+		//console.log("image error:%s", imageObj);
 
 		if (type == CompareType.TARGET) {
-			dlog("load target image fail and continue");
+			//console.log("load target image fail and continue");
 			imageInfo.status = MatchStatus.LOADFAIL;
 			handledNumber++;
 			updateStatusText();
@@ -288,10 +299,10 @@ function getImageThenSendToServer(imageInfo, type) {
 	}
 
 	// imageObj.onabort = function() {
-	// 	dlog("image abort:%s", imageObj);
+	// 	//console.log("image abort:%s", imageObj);
 	//
 	// 	if (type == CompareType.TARGET) {
-	// 		dlog("load target image fail and continue");
+	// 		//console.log("load target image fail and continue");
 	// 		getNextImageToHandle();
 	// 	} else {
 	// 		resetWhenGetNoFaceSourceInfo();
@@ -305,32 +316,32 @@ function getImageThenSendToServer(imageInfo, type) {
 
 	function handleLoadOK() {
 
-		// console.log("process type1:", process.type)
+		//console.log("type:", type)
 
-		if(!t2){
-			t2 = new Date().getTime();
-		}
+		// if(!t2){
+		// 	t2 = new Date().getTime();
+		// }
 
 		// var imageObj = $currentImage[0];
 		if(!canvas){
 			canvas = document.createElement('canvas');
+		  context = canvas.getContext('2d');
 		}
 		canvas.width = imageObj.width;
 		canvas.height = imageObj.height;
-		var context = canvas.getContext('2d');
 		context.drawImage(imageObj, 0, 0);
 
 		// var imageData = context.getImageData(0, 0, imageObj.width, imageObj.height);
-		// dlog('imageData:', imageData);
+		// //console.log('imageData:', imageData);
 
 		var dataURL = canvas.toDataURL('image/jpeg', 0.5)
 
-		if(!t3){
-			t3 = new Date().getTime();
-		}
+		// if(!t3){
+		// 	t3 = new Date().getTime();
+		// }
 
-		dlog('Image:%s. Width:%s,height:%s', imageInfo.imagePath, imageObj.width, imageObj.height);
-		dlog("file ->image:%s;image obj -> jpeg:%s", (t2 - t1), (t3 - t2));
+		//console.log('Image:%s. Width:%s,height:%s', imageInfo.imagePath, imageObj.width, imageObj.height);
+		// //console.log("file ->image:%s;image obj -> jpeg:%s", (t2 - t1), (t3 - t2));
 
 		var data = {
 			imagePath: imageInfo.imagePath,
@@ -343,10 +354,10 @@ function getImageThenSendToServer(imageInfo, type) {
 		client.sendData(data);
 
 		if (type == CompareType.TARGET) {
-			dlog("load target image ok and continue");
-			getNextImageToHandle();
+			//console.log("load target image ok");
+			// getNextImageToHandle();
 		} else {
-
+			//console.log("load source face ok then send ")
 			// if(type == CompareType.SOURCE){
 				// imageFiles = [];
 				// currentImageFileIndex = '';
@@ -362,7 +373,7 @@ function getImageThenSendToServer(imageInfo, type) {
 
 function getNextImageToHandle(){
 	if (waittingImageList.length>0){
-		dlog("get file from waittingImageList ok")
+		//console.log("get file from waittingImageList ok")
 		// var selectedImage = waittingImageList[0];
 
 		var imageInfo = {
@@ -374,7 +385,7 @@ function getNextImageToHandle(){
 		waittingImageList.shift();
 		getImageThenSendToServer(imageInfo, CompareType.TARGET);
 	} else {
-		dlog("waittingImageList is empty !!!")
+		//console.log("waittingImageList is empty !!!")
 	}
 }
 
@@ -394,7 +405,7 @@ function showImage(index) {
 		$currentImage[0].src = showImageObj.src;
 		// $currentImage.attr('src', imageFiles[index]).load(function() {
 		currentImageFileIndex = index;//imageFiles[index];
-		dlog('show current image:', imageFiles[index]);
+		//console.log('show current image:', imageFiles[index]);
 
 		// Hide show previous/next if there are no more/less files.
 		// $next.toggle(!(index + 1 === imageFiles.length));
@@ -471,10 +482,10 @@ function toggleFullScreen() {
 function testArrayBufferJSON(imageFile) {
 	getPixels(imageFile, function(err, pixels) {
 		if (err) {
-			dlog("Bad image path")
+			//console.log("Bad image path")
 			return
 		}
-		dlog("got pixels:", pixels.shape.slice())
+		//console.log("got pixels:", pixels.shape.slice())
 
 		var data = {
 			type: 'COMPARE',
@@ -484,9 +495,9 @@ function testArrayBufferJSON(imageFile) {
 				// height: canvas.height
 		};
 		var sendData = JSON.stringify(data);
-		dlog("after jsoned pixels:", sendData.length);
+		//console.log("after jsoned pixels:", sendData.length);
 		client.sendData(sendData);
-		dlog("after send");
+		//console.log("after send");
 	})
 
 }
@@ -535,7 +546,7 @@ function loadDir(dir, fileName) {
 		// }
 	}
 
-	dlog("open target folder, total candidate:%s", num_Images);
+	//console.log("open target folder, total candidate:%s", num_Images);
 
 	resetAllImagesStatusWhenTarget();
 
@@ -549,7 +560,7 @@ function loadDir(dir, fileName) {
 	//
 	//
 	// 	if (sourceFilePath) {
-	// 		// dlog("loop:",i);
+	// 		// //console.log("loop:",i);
 	// 		// process.nextTick(function(){
 	//
 	//
@@ -558,10 +569,10 @@ function loadDir(dir, fileName) {
 	// 	// waittingImageList.push(imageInfo);
 	//
 	// }
-	// dlog("open folder after selecting source, end sending all match data");
+	// //console.log("open folder after selecting source, end sending all match data");
 
 	if (sourceFilePath) {
-		dlog("start to prepare images and match");
+		//console.log("start to prepare images and match");
 
 		getNextImageToHandle();
 		// if (waittingImageList.length>0){
@@ -578,7 +589,7 @@ function loadDir(dir, fileName) {
 		// }
 
 	} else {
-		dlog("No set source image yet !!!");
+		//console.log("No set source image yet !!!");
 		alert('No set source image yet');
 		return;
 	}
@@ -586,7 +597,7 @@ function loadDir(dir, fileName) {
 
 var onOpenSource = function(filePath) {
 	//renderer process
-	dlog('open Source and send to server, clear previous imageFiles');
+	//console.log('open Source and send to server, clear previous imageFiles');
 
 	// currentImageFileIndex = '';
 	var imageInfo = {
