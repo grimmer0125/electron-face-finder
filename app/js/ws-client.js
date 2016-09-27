@@ -25,13 +25,22 @@ module.exports = {
     }
 
     try {
-      var firstData = this.sendQueue[0];
+
       // console.log("try to send data:", firstData.length);
 
       // http://stackoverflow.com/questions/24786628/web-socket-exception-could-not-be-caught
       // workaround to solving can not catch problem
       if( self.socket && self.socket.readyState === 1){
-        this.socket.send(firstData);
+
+        // if (this.sendQueue.length ==1){
+        //
+        // } else {
+          // firstData = this.sendQueue[0];
+        this.socket.send(this.sendQueue[0]);
+        // }
+
+        // this.socket.send(firstData);
+        
         this.sendQueue.shift();
         if(this.sendQueue.length>0){
           process.nextTick(function(){

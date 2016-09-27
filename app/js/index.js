@@ -46,7 +46,7 @@ var $currentImage = $('#currentImage'),
 
 // the list of all retrieved files
 var imageFiles = [],
-	currentImageFile = '',
+	currentImageFileIndex = -1,
 	currentDir = '';
 
 // added by grimmer
@@ -70,12 +70,12 @@ var t1, t2, t3;
 var imageObj, canvas, showImageObj;
 
 function resetWhenGetNoFaceSourceInfo(){
-	sourceFilePath = "";
+	sourceFilePath = -1;
 	$sourceImage[0].src = null;
 }
 
 function resetAllImagesStatusWhenTarget(){
-	currentImageFile = '';
+	currentImageFileIndex = -1;
 	imageFiles = [];
 
 	// reset handling
@@ -90,7 +90,7 @@ function resetAllImagesStatusWhenTarget(){
 
 function resetAllImagesStatus() {
 
-	currentImageFile = '';
+	currentImageFileIndex = -1;
 	imageFiles = [];
 
 	// reset handling
@@ -108,20 +108,24 @@ function resetAllImagesStatus() {
 	return;
 }
 
+// function onlyUpdateHandledText(){
+//
+// }
+
 function updateStatusText() {
-	var index = imageFiles.indexOf(currentImageFile);
+	// var index = imageFiles.indexOf(currentImageFileIndex);
 	// var currentImage = (index + 1);
 	// var totalMatched = imageFiles.length;
 	// var totalFiles = (waittingImageList.length+handlingImageList.length);
-	var totalHandled = countHandledImages();
+	// var totalHandled = countHandledImages();
 	//handling includes failed
 	var totalHandling = handlingImageList.length;
 
 	var statsText =              "Matched: "+
-	                            (index + 1) + 'th/' +
+	                            (currentImageFileIndex + 1) + 'th/' +
 	                      imageFiles.length + ". Total: " +
 	  (waittingImageList.length+handlingImageList.length) + ". Handled: " +
-		            totalHandled + "";
+		            handledNumber + "";
 
 	$directoryStats.text(statsText);
 }
@@ -209,6 +213,7 @@ function receiveTargetImageInfo(data){
 					if (imageFiles.length == 1) {
 						// var selectedImageIndex = 0;
 						dlog('to show image !!!');
+
 						showImage(0);
 					}
 					else {
@@ -261,10 +266,11 @@ function getImageThenSendToServer(imageInfo, type) {
 
 	if(!imageObj){
 		imageObj = new Image();
+		imageObj.onerror = handleLoadError;
+		imageObj.onload = handleLoadOK;
 	}
 
 	imageObj.src = imageInfo.imagePath;
-	imageObj.onerror = handleLoadError;
 
 	function handleLoadError() {
 		dlog("image error:%s", imageObj);
@@ -296,7 +302,6 @@ function getImageThenSendToServer(imageInfo, type) {
 	// var str = "Visit Microsoft!";
   // var res = str.replace("Microsoft", "W3Schools");
 
-	imageObj.onload = handleLoadOK;
 
 	function handleLoadOK() {
 
@@ -344,7 +349,7 @@ function getImageThenSendToServer(imageInfo, type) {
 
 			// if(type == CompareType.SOURCE){
 				// imageFiles = [];
-				// currentImageFile = '';
+				// currentImageFileIndex = '';
 			resetAllImagesStatus();
 			updateStatusText();
 			sourceFilePath = imageInfo.imagePath;
@@ -388,8 +393,8 @@ function showImage(index) {
 
 		$currentImage[0].src = showImageObj.src;
 		// $currentImage.attr('src', imageFiles[index]).load(function() {
-		dlog('show current image:', currentImageFile);
-		currentImageFile = imageFiles[index];
+		currentImageFileIndex = index;//imageFiles[index];
+		dlog('show current image:', imageFiles[index]);
 
 		// Hide show previous/next if there are no more/less files.
 		// $next.toggle(!(index + 1 === imageFiles.length));
@@ -400,7 +405,7 @@ function showImage(index) {
 		// var statsText = (index + 1) + ' / ' + imageFiles.length;
 		// $directoryStats.text(statsText);
 
-		ipc.send('image-changed', currentImageFile);
+		ipc.send('image-changed', imageFiles[index]);
 	};
 
 };
@@ -512,7 +517,7 @@ function loadDir(dir, fileName) {
 	// 	return;
 	// }
 
-	// currentImageFile = '';
+	// currentImageFileIndex = '';
 	// imageFiles = [];
 	// waittingImageList = [];
 
@@ -583,7 +588,7 @@ var onOpenSource = function(filePath) {
 	//renderer process
 	dlog('open Source and send to server, clear previous imageFiles');
 
-	// currentImageFile = '';
+	// currentImageFileIndex = '';
 	var imageInfo = {
 		imagePath: utilities.processSpecialCharacter((filePath + '')),
 		status: MatchStatus.STARTING
@@ -617,7 +622,7 @@ var onDirOpen = function(dir) {
 var onFileDelete = function() {
 
 	// file has been deleted, show previous or next...
-	var index = imageFiles.indexOf(currentImageFile);
+	var index = currentImageFileIndex; //imageFiles.indexOf(currentImageFileIndex);
 	if (index > -1) {
 		imageFiles.splice(index, 1);
 	}
@@ -631,7 +636,11 @@ var onFileDelete = function() {
 };
 
 var getCurrentFile = function() {
-	return currentImageFile;
+	if(currentImageFileIndex>=0){
+		return imageFiles[currentImageFileIndex];
+	}
+
+	return "";
 };
 
 var setRotateDegrees = function(deg) {
