@@ -20,6 +20,8 @@
 7. Support multiple faces in an image file.
 8. ~~try to support the image path having "%"~~
 9. use readAsArrayBuffer to read a image file and send to the server instead of the current way, which adapts FILE -decoding> Image object -draw/copy> canvas -> jpeg-base64-DataURL then send. 
+10. Linux, Windows support
+11. When getting the response from the server, use dictionary to lookup the image object instead of using array.
 
 # Before run in in development environment or download a packaged app, you need Docker for Mac.
 
@@ -45,6 +47,8 @@ After installing it, type `docker pull grimmer0125/electricface`(web:[https://hu
 
 ### Download the distributed binary packaged Electron app, FaceFinder.dmg form here.
 [http://goo.gl/GsNWJe](http://goo.gl/GsNWJe)
+
+### When use this applicaiton, please do not quit Docker. 
 
 # Face Finder/Matcher
 
