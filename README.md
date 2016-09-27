@@ -5,7 +5,7 @@
 ### Known Issues:
 1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon.
 2. Slow python WebSocket in Docker. Need to debug it.
-3. cpu usage is too high.
+3. cpu and memory usage is too high.
 4. sometimes html image object will load an image file in a wrong way. Such as rotating a 90/180 degree somehow. It is exif issue.
 5. ~~If the folder contain too many images(may hundred of files), "out of memory" will happen and throw exception, net::ERR_INSUFFICIENT_RESOURCES.~~
 6. ~~Need to hanle the exception due to the symbolic link of a file.~~
@@ -19,6 +19,7 @@
 6. Add Mac app signing.
 7. Support multiple faces in an image file.
 8. ~~try to support the image path having "%"~~
+9. use readAsArrayBuffer to read a image file and send to the server instead of the current way, which adapts FILE -decoding> Image object -draw/copy> canvas -> jpeg-base64-DataURL then send. 
 
 # Before run in in development environment or download a packaged app, you need Docker for Mac.
 
