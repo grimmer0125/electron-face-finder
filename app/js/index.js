@@ -53,6 +53,7 @@ var imageFiles = [],
 var sourceFilePath = "";
 var waittingImageList = [];
 var handlingImageList = [];
+var handledNumber = 0;
 var CompareType = {
 	SOURCE: "COMPARE_SOURCE",
 	TARGET: "COMPARE_TARGET"
@@ -81,6 +82,7 @@ function resetAllImagesStatusWhenTarget(){
 	// step1: copy data to waitting, no need this step
 	// step2:
 	handlingImageList = [];
+	handledNumber = 0;
 
 	// reset total
 	waittingImageList = [];
@@ -101,23 +103,26 @@ function resetAllImagesStatus() {
 
 	// step2:
 	handlingImageList = [];
+	handledNumber = 0;
 
 	return;
 }
 
 function updateStatusText() {
 	var index = imageFiles.indexOf(currentImageFile);
-	var currentImage = (index + 1);
-	var totalMatched = imageFiles.length;
-	var totalFiles = (waittingImageList.length+handlingImageList.length);
+	// var currentImage = (index + 1);
+	// var totalMatched = imageFiles.length;
+	// var totalFiles = (waittingImageList.length+handlingImageList.length);
 	var totalHandled = countHandledImages();
 	//handling includes failed
 	var totalHandling = handlingImageList.length;
 
-	var statsText = "Matched: "+ currentImage + 'th/' +
-	                totalMatched +". Total: " +  +
-									totalFiles + ". Handled: " +
-		          totalHandled + "";
+	var statsText =              "Matched: "+
+	                            (index + 1) + 'th/' +
+	                      imageFiles.length + ". Total: " +
+	  (waittingImageList.length+handlingImageList.length) + ". Handled: " +
+		            totalHandled + "";
+
 	$directoryStats.text(statsText);
 }
 
@@ -176,31 +181,35 @@ function receiveSourceImageInfo(data){
 
 function receiveTargetImageInfo(data){
 
-	var ifMatch = null,
-		imagePath = null;
-	if (data.hasOwnProperty("ifMatch")) {
-		ifMatch = data.ifMatch;
-	}
-	if (data.hasOwnProperty("imagePath")) {
-		imagePath = data.imagePath;
-	}
+	// var ifMatch = null,
+	// 	imagePath = null;
+	// if (data.hasOwnProperty("ifMatch")) {
+	// 	ifMatch = data.ifMatch;
+	// }
+	// if (data.hasOwnProperty("imagePath")) {
+	// 	imagePath = data.imagePath;
+	// }
 
-	if (ifMatch !== null && imagePath != null) {
+	if (data.hasOwnProperty("ifMatch") && data.ifMatch !== null &&
+	    data.hasOwnProperty("imagePath") && data.imagePath != null) {
+
 		var len = handlingImageList.length;
 		for (var i = 0; i < len; i++) {
 			var imageInfo = handlingImageList[i];
-			if (imageInfo.imagePath == imagePath) {
+			if (imageInfo.imagePath == data.imagePath) {
+
+				handledNumber++;
 
 				// match時一定會讓 matched +1 / total / handling
-				if (ifMatch) {
+				if (data.ifMatch) {
 					imageInfo.status = MatchStatus.MATCH;
 					imageFiles.push(imageInfo.imagePath)
 
 					// try to show the image
 					if (imageFiles.length == 1) {
-						var selectedImageIndex = 0;
+						// var selectedImageIndex = 0;
 						dlog('to show image !!!');
-						showImage(selectedImageIndex);
+						showImage(0);
 					}
 					else {
 						updateStatusText();
@@ -242,7 +251,9 @@ function imageInfoReceiver(data) {
 client.registerReceiveHandler(imageInfoReceiver);
 
 function getImageThenSendToServer(imageInfo, type) {
-	var imagePath = imageInfo.imagePath;
+	// console.log("process type0:", process.type)
+
+	// var imagePath = imageInfo.imagePath;
 	// dlog("get image then send to server,type:%s;%s", type, imagePath);
 	if(!t1){
 		t1 = new Date().getTime();
@@ -252,20 +263,23 @@ function getImageThenSendToServer(imageInfo, type) {
 		imageObj = new Image();
 	}
 
-	imageObj.src = imagePath;
-	imageObj.onerror = function() {
+	imageObj.src = imageInfo.imagePath;
+	imageObj.onerror = handleLoadError;
+
+	function handleLoadError() {
 		dlog("image error:%s", imageObj);
 
 		if (type == CompareType.TARGET) {
 			dlog("load target image fail and continue");
 			imageInfo.status = MatchStatus.LOADFAIL;
+			handledNumber++;
 			updateStatusText();
 			getNextImageToHandle();
 		} else {
 			// resetWhenGetNoFaceSourceInfo();
 			alert('source image file has load error, please change');
 		}
-	};
+	}
 
 	// imageObj.onabort = function() {
 	// 	dlog("image abort:%s", imageObj);
@@ -282,7 +296,11 @@ function getImageThenSendToServer(imageInfo, type) {
 	// var str = "Visit Microsoft!";
   // var res = str.replace("Microsoft", "W3Schools");
 
-	imageObj.onload = function() {
+	imageObj.onload = handleLoadOK;
+
+	function handleLoadOK() {
+
+		// console.log("process type1:", process.type)
 
 		if(!t2){
 			t2 = new Date().getTime();
@@ -306,18 +324,18 @@ function getImageThenSendToServer(imageInfo, type) {
 			t3 = new Date().getTime();
 		}
 
-		dlog('Image:%s. Width:%s,height:%s', imagePath, imageObj.width, imageObj.height);
+		dlog('Image:%s. Width:%s,height:%s', imageInfo.imagePath, imageObj.width, imageObj.height);
 		dlog("file ->image:%s;image obj -> jpeg:%s", (t2 - t1), (t3 - t2));
 
 		var data = {
-			imagePath: imagePath,
+			imagePath: imageInfo.imagePath,
 			type: type,
 			dataURL: dataURL,
 			width: canvas.width,
 			height: canvas.height
 		};
 
-		client.sendData(JSON.stringify(data));
+		client.sendData(data);
 
 		if (type == CompareType.TARGET) {
 			dlog("load target image ok and continue");
@@ -329,22 +347,22 @@ function getImageThenSendToServer(imageInfo, type) {
 				// currentImageFile = '';
 			resetAllImagesStatus();
 			updateStatusText();
-			sourceFilePath = imagePath;
+			sourceFilePath = imageInfo.imagePath;
 			$sourceImage[0].src = sourceFilePath; //.src = sourceFilePath;//why not use sourceFilePath originally? filePath;
 			// }
 
 		}
-	};
+	}
 }
 
 function getNextImageToHandle(){
 	if (waittingImageList.length>0){
 		dlog("get file from waittingImageList ok")
-		var selectedImage = waittingImageList[0];
+		// var selectedImage = waittingImageList[0];
 
 		var imageInfo = {
-			imagePath: selectedImage,
-			status: MatchStatus.STARTING
+			imagePath: waittingImageList[0],
+			status: MatchStatus.STARTING,
 		};
 
 		handlingImageList.push(imageInfo);

@@ -9,15 +9,20 @@ module.exports = {
   },
 
   sendData: function(data){
+
+    if(typeof data == "object"){
+      data = JSON.stringify(data);
+    }
+
     if(data){
       this.sendQueue.push(data);
     }
+
     var self = this;
 
     if(this.sendQueue.length==0){
       return;
     }
-
 
     try {
       var firstData = this.sendQueue[0];
@@ -78,7 +83,9 @@ module.exports = {
       self.sendData();
     };
     this.socket.onmessage = function(e) {
-      console.log("get data !!!! :", e.data);
+      // console.log("process type2:", process.type)
+
+      // console.log("get data !!!! :", e.data);
       var data = JSON.parse(e.data);
       self.receiveHandler(data);
     };

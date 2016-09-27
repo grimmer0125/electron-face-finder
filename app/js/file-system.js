@@ -15,6 +15,8 @@ module.exports = {
 	// },
 	getAllImageFiles: function(dir) {
 
+		// console.log("process type3:", process.type)
+
 		console.log('select dir:', dir);
 		var imageFiles = [];
 
