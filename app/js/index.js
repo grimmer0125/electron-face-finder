@@ -15,11 +15,22 @@ var constants = require('./js/constants');
 var client = require('./js/ws-client');
 client.createSocket();
 
+
+var dlog;
+
 // for debugging
 if (process.env.NODE_ENV == "debug" || process.env.NODE_ENV == "dev"){
 	console.log("require getpixels");
 	var getPixels = require("get-pixels")
+	dlog = function(log){
+		// console.log(arguments);
+	} ;
+}	else {
+	dlog = function(log){
+	};
 }
+
+
 
 // jquery selectors
 var $currentImage = $('#currentImage'),
@@ -54,6 +65,8 @@ var MatchStatus = {
 	NOFACE: 4,
 	LOADFAIL:5
 };
+var t1, t2, t3;
+var imageObj, canvas, showImageObj;
 
 function resetWhenGetNoFaceSourceInfo(){
 	sourceFilePath = "";
@@ -133,10 +146,10 @@ function countHandledImages() {
 function receiveSourceImageInfo(data){
 	// if (data.hasOwnProperty("type") && data.type == CompareType.SOURCE) {
 
-	console.log("Res: source info!!");
+	dlog("Res: source info!!");
 
 	if (data.representationStatus == false) {
-		console.log("Res: source representation info fail!!!");
+		dlog("Res: source representation info fail!!!");
 
 		alert('Can not find any face in the source image. please select again');
 		resetWhenGetNoFaceSourceInfo();
@@ -144,7 +157,7 @@ function receiveSourceImageInfo(data){
 	}
 
 
-	console.log("selected source, now start to match");
+	dlog("selected source, now start to match");
 	getNextImageToHandle();
 
 	// var num_Images = waittingImageList.length;
@@ -157,7 +170,7 @@ function receiveSourceImageInfo(data){
 		// 	getImageThenSendToServer(selectedImageInfo.imagePath, CompareType.TARGET);
 		// 	selectedImageInfo.status = MatchStatus.STARTING;
 		// }
-		// console.log("open folder before selecting source, end sending all match data");
+		// dlog("open folder before selecting source, end sending all match data");
 	// }
 }
 
@@ -186,7 +199,7 @@ function receiveTargetImageInfo(data){
 					// try to show the image
 					if (imageFiles.length == 1) {
 						var selectedImageIndex = 0;
-						console.log('to show image !!!');
+						dlog('to show image !!!');
 						showImage(selectedImageIndex);
 					}
 					else {
@@ -213,7 +226,7 @@ function imageInfoReceiver(data) {
 
 	if (data.hasOwnProperty("type")==false) {
 
-		console.log("Res: type property is missing !!!");
+		dlog("Res: type property is missing !!!");
 		return;
 	}
 
@@ -222,7 +235,7 @@ function imageInfoReceiver(data) {
 		return;
 	}
 
-	console.log("Res: target afterCompare");
+	dlog("Res: target afterCompare");
 
 	receiveTargetImageInfo(data);
 }
@@ -230,16 +243,21 @@ client.registerReceiveHandler(imageInfoReceiver);
 
 function getImageThenSendToServer(imageInfo, type) {
 	var imagePath = imageInfo.imagePath;
-	// console.log("get image then send to server,type:%s;%s", type, imagePath);
-	var t1 = new Date().getTime();
+	// dlog("get image then send to server,type:%s;%s", type, imagePath);
+	if(!t1){
+		t1 = new Date().getTime();
+	}
 
-	var imageObj = new Image();
+	if(!imageObj){
+		imageObj = new Image();
+	}
+
 	imageObj.src = imagePath;
 	imageObj.onerror = function() {
-		console.log("image error:%s", imageObj);
+		dlog("image error:%s", imageObj);
 
 		if (type == CompareType.TARGET) {
-			console.log("load target image fail and continue");
+			dlog("load target image fail and continue");
 			imageInfo.status = MatchStatus.LOADFAIL;
 			updateStatusText();
 			getNextImageToHandle();
@@ -250,10 +268,10 @@ function getImageThenSendToServer(imageInfo, type) {
 	};
 
 	// imageObj.onabort = function() {
-	// 	console.log("image abort:%s", imageObj);
+	// 	dlog("image abort:%s", imageObj);
 	//
 	// 	if (type == CompareType.TARGET) {
-	// 		console.log("load target image fail and continue");
+	// 		dlog("load target image fail and continue");
 	// 		getNextImageToHandle();
 	// 	} else {
 	// 		resetWhenGetNoFaceSourceInfo();
@@ -266,22 +284,30 @@ function getImageThenSendToServer(imageInfo, type) {
 
 	imageObj.onload = function() {
 
-		var t2 = new Date().getTime();
+		if(!t2){
+			t2 = new Date().getTime();
+		}
 
 		// var imageObj = $currentImage[0];
-		var canvas = document.createElement('canvas');
+		if(!canvas){
+			canvas = document.createElement('canvas');
+		}
 		canvas.width = imageObj.width;
 		canvas.height = imageObj.height;
 		var context = canvas.getContext('2d');
 		context.drawImage(imageObj, 0, 0);
 
 		// var imageData = context.getImageData(0, 0, imageObj.width, imageObj.height);
-		// console.log('imageData:', imageData);
+		// dlog('imageData:', imageData);
 
 		var dataURL = canvas.toDataURL('image/jpeg', 0.5)
-		var t3 = new Date().getTime();
-		console.log('Image:%s. Width:%s,height:%s', imagePath, imageObj.width, imageObj.height);
-		console.log("file ->image:%s;image obj -> jpeg:%s", (t2 - t1), (t3 - t2));
+
+		if(!t3){
+			t3 = new Date().getTime();
+		}
+
+		dlog('Image:%s. Width:%s,height:%s', imagePath, imageObj.width, imageObj.height);
+		dlog("file ->image:%s;image obj -> jpeg:%s", (t2 - t1), (t3 - t2));
 
 		var data = {
 			imagePath: imagePath,
@@ -294,7 +320,7 @@ function getImageThenSendToServer(imageInfo, type) {
 		client.sendData(JSON.stringify(data));
 
 		if (type == CompareType.TARGET) {
-			console.log("load target image ok and continue");
+			dlog("load target image ok and continue");
 			getNextImageToHandle();
 		} else {
 
@@ -313,7 +339,7 @@ function getImageThenSendToServer(imageInfo, type) {
 
 function getNextImageToHandle(){
 	if (waittingImageList.length>0){
-		console.log("get file from waittingImageList ok")
+		dlog("get file from waittingImageList ok")
 		var selectedImage = waittingImageList[0];
 
 		var imageInfo = {
@@ -325,7 +351,7 @@ function getNextImageToHandle(){
 		waittingImageList.shift();
 		getImageThenSendToServer(imageInfo, CompareType.TARGET);
 	} else {
-		console.log("waittingImageList is empty !!!")
+		dlog("waittingImageList is empty !!!")
 	}
 }
 
@@ -336,13 +362,15 @@ function showImage(index) {
 	setRotateDegrees(0);
 	$currentImage.data('currentIndex', index);
 
-	var imageObj = new Image();
-	imageObj.src = imageFiles[index]; //'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
-	imageObj.onload = function() {
+	if(!showImageObj){
+		showImageObj = new Image();
+	}
+	showImageObj.src = imageFiles[index]; //'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
+	showImageObj.onload = function() {
 
-		$currentImage[0].src = imageObj.src;
+		$currentImage[0].src = showImageObj.src;
 		// $currentImage.attr('src', imageFiles[index]).load(function() {
-		console.log('show current image:', currentImageFile);
+		dlog('show current image:', currentImageFile);
 		currentImageFile = imageFiles[index];
 
 		// Hide show previous/next if there are no more/less files.
@@ -420,10 +448,10 @@ function toggleFullScreen() {
 function testArrayBufferJSON(imageFile) {
 	getPixels(imageFile, function(err, pixels) {
 		if (err) {
-			console.log("Bad image path")
+			dlog("Bad image path")
 			return
 		}
-		console.log("got pixels:", pixels.shape.slice())
+		dlog("got pixels:", pixels.shape.slice())
 
 		var data = {
 			type: 'COMPARE',
@@ -433,9 +461,9 @@ function testArrayBufferJSON(imageFile) {
 				// height: canvas.height
 		};
 		var sendData = JSON.stringify(data);
-		console.log("after jsoned pixels:", sendData.length);
+		dlog("after jsoned pixels:", sendData.length);
 		client.sendData(sendData);
-		console.log("after send");
+		dlog("after send");
 	})
 
 }
@@ -484,7 +512,7 @@ function loadDir(dir, fileName) {
 		// }
 	}
 
-	console.log("open target folder, total candidate:%s", num_Images);
+	dlog("open target folder, total candidate:%s", num_Images);
 
 	resetAllImagesStatusWhenTarget();
 
@@ -498,7 +526,7 @@ function loadDir(dir, fileName) {
 	//
 	//
 	// 	if (sourceFilePath) {
-	// 		// console.log("loop:",i);
+	// 		// dlog("loop:",i);
 	// 		// process.nextTick(function(){
 	//
 	//
@@ -507,10 +535,10 @@ function loadDir(dir, fileName) {
 	// 	// waittingImageList.push(imageInfo);
 	//
 	// }
-	// console.log("open folder after selecting source, end sending all match data");
+	// dlog("open folder after selecting source, end sending all match data");
 
 	if (sourceFilePath) {
-		console.log("start to prepare images and match");
+		dlog("start to prepare images and match");
 
 		getNextImageToHandle();
 		// if (waittingImageList.length>0){
@@ -527,7 +555,7 @@ function loadDir(dir, fileName) {
 		// }
 
 	} else {
-		console.log("No set source image yet !!!");
+		dlog("No set source image yet !!!");
 		alert('No set source image yet');
 		return;
 	}
@@ -535,7 +563,7 @@ function loadDir(dir, fileName) {
 
 var onOpenSource = function(filePath) {
 	//renderer process
-	console.log('open Source and send to server, clear previous imageFiles');
+	dlog('open Source and send to server, clear previous imageFiles');
 
 	// currentImageFile = '';
 	var imageInfo = {

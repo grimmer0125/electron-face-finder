@@ -21,7 +21,7 @@ module.exports = {
 
     try {
       var firstData = this.sendQueue[0];
-      console.log("try to send data:", firstData.length);
+      // console.log("try to send data:", firstData.length);
 
       // http://stackoverflow.com/questions/24786628/web-socket-exception-could-not-be-caught
       // workaround to solving can not catch problem
