@@ -21,7 +21,7 @@ module.exports = {
 		var imageFiles = [];
 
 		getImages(dir, imageFiles);
-		console.log('all:', imageFiles);
+		// console.log('all leng:', imageFiles);
 
 		return imageFiles;
 	}
@@ -49,7 +49,7 @@ function isDirectory(path){
 	try {
 		answer = fs.statSync(path).isDirectory();
 	} catch(err) {
-		console.log("some statSync err happen:", err);
+		console.log("statSync err happen:", err);
 	}
 	return answer;
 }

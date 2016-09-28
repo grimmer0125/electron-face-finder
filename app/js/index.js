@@ -1,5 +1,8 @@
 'use strict';
 
+console.log("os:", process.platform)
+// darwin
+
 var utilities = require('./js/utilities');
 
 var fs = require('fs');
@@ -125,7 +128,7 @@ function updateStatusText() {
 	var statsText =              "Matched: "+
 	                            (currentImageFileIndex + 1) + 'th/' +
 	                      imageFiles.length + ". Total: " +
-	  (waittingImageList.length+handlingOrHandledImageList.length) + ". Handled: " +
+	  (waittingImageList.length+totalHandling) + ". Handled: " +
 		            handledNumber + "";
 
 	$directoryStats.text(statsText);
@@ -238,7 +241,9 @@ function receiveTargetImageInfo(data){
 		}
 
 		if (ifMatch) {
-			console.log("get 1 image info back and next");
+			if (handledNumber%10==0){
+				console.log("get 10 more images handled and next");
+			}
 			getNextImageToHandle();
 		}
 	}
@@ -286,9 +291,14 @@ function getImageThenSendToServer(imageInfo, type) {
 		//console.log("image error:%s", imageObj);
 
 		if (type == CompareType.TARGET) {
-			console.log("load target image fail");
+			// console.log("load target image fail");
 			imageInfo.status = MatchStatus.LOADFAIL;
 			handledNumber++;
+
+			if (handledNumber%10==0){
+				console.log("get 10 more images handled and next");
+			}
+
 			updateStatusText();
 			getNextImageToHandle();
 		} else {
@@ -423,7 +433,7 @@ function showImage(index) {
 var toggleButtons = function(hasSelectedImage) {
 	// disable buttons?
 	if (hasSelectedImage) {
-		$openFile.hide();
+		// $openFile.hide();
 		$currentImage.show();
 		$controlPanel.show();
 	} else {
@@ -599,6 +609,7 @@ var onOpenSource = function(filePath) {
 	//console.log('open Source and send to server, clear previous imageFiles');
 
 	// currentImageFileIndex = '';
+	console.log("source:",utilities.processSpecialCharacter((filePath + '')));
 	var imageInfo = {
 		imagePath: utilities.processSpecialCharacter((filePath + '')),
 		status: MatchStatus.STARTING

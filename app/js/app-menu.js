@@ -90,30 +90,30 @@ module.exports = {
 								});
 						}
 					},
-					{
-						label: 'Make a copy',
-						accelerator: 'CmdOrCtrl+S',
-						click: function() {
-							var currentFile = self.options.getCurrentFile();
-							var selectedFileName = path.basename(currentFile);
-							var ext = (path.extname(currentFile) + '').slice(1);
-							dialog.showSaveDialog({
-								title: 'Save as...',
-								defaultPath: currentFile,
-								filters: [{
-									name: selectedFileName,
-									extensions: [ ext ]
-								}]
-							}, function(fileName) {
-							    if (fileName === undefined) return;
-							    copyFile(currentFile, fileName, function(err) {
-									if (err) {
-										return dialog.showErrorBox("File Save Error", err.message);
-							     	}
-							    });
-							});
-						}
-					},
+					// {
+					// 	label: 'Make a copy',
+					// 	accelerator: 'CmdOrCtrl+S',
+					// 	click: function() {
+					// 		var currentFile = self.options.getCurrentFile();
+					// 		var selectedFileName = path.basename(currentFile);
+					// 		var ext = (path.extname(currentFile) + '').slice(1);
+					// 		dialog.showSaveDialog({
+					// 			title: 'Save as...',
+					// 			defaultPath: currentFile,
+					// 			filters: [{
+					// 				name: selectedFileName,
+					// 				extensions: [ ext ]
+					// 			}]
+					// 		}, function(fileName) {
+					// 		    if (fileName === undefined) return;
+					// 		    copyFile(currentFile, fileName, function(err) {
+					// 				if (err) {
+					// 					return dialog.showErrorBox("File Save Error", err.message);
+					// 		     	}
+					// 		    });
+					// 		});
+					// 	}
+					// },
 					// {
 					// 	label: 'Delete',
 					// 	click: function() {
