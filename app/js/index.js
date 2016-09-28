@@ -52,7 +52,7 @@ var imageFiles = [],
 // added by grimmer
 var sourceFilePath = "";
 var waittingImageList = [];
-var handlingImageList = [];
+var handlingOrHandledImageList = [];
 var handledNumber = 0;
 var CompareType = {
 	SOURCE: "COMPARE_SOURCE",
@@ -82,7 +82,7 @@ function resetAllImagesStatusWhenTarget(){
 	// reset handling
 	// step1: copy data to waitting, no need this step
 	// step2:
-	handlingImageList = [];
+	handlingOrHandledImageList = [];
 	handledNumber = 0;
 
 	// reset total
@@ -96,14 +96,14 @@ function resetAllImagesStatus() {
 
 	// reset handling
 	// step1: copy data to waitting
-	var len = handlingImageList.length;
+	var len = handlingOrHandledImageList.length;
 	for (var i=0; i<len; i++){
-		var imageInfo = handlingImageList[i];
+		var imageInfo = handlingOrHandledImageList[i];
 		waittingImageList.push(imageInfo.imagePath);
 	}
 
 	// step2:
-	handlingImageList = [];
+	handlingOrHandledImageList = [];
 	handledNumber = 0;
 
 	return;
@@ -117,33 +117,33 @@ function updateStatusText() {
 	// var index = imageFiles.indexOf(currentImageFileIndex);
 	// var currentImage = (index + 1);
 	// var totalMatched = imageFiles.length;
-	// var totalFiles = (waittingImageList.length+handlingImageList.length);
+	// var totalFiles = (waittingImageList.length+handlingOrHandledImageList.length);
 	// var totalHandled = countHandledImages();
 	//handling includes failed
-	var totalHandling = handlingImageList.length;
+	var totalHandling = handlingOrHandledImageList.length;
 
 	var statsText =              "Matched: "+
 	                            (currentImageFileIndex + 1) + 'th/' +
 	                      imageFiles.length + ". Total: " +
-	  (waittingImageList.length+handlingImageList.length) + ". Handled: " +
+	  (waittingImageList.length+handlingOrHandledImageList.length) + ". Handled: " +
 		            handledNumber + "";
 
 	$directoryStats.text(statsText);
 }
 
-function countHandledImages() {
-
-	var count = 0;
-	var len = handlingImageList.length;
-	for (var i = 0; i < len; i++) {
-		var imageInfo = handlingImageList[i];
-		if (imageInfo.status != MatchStatus.STARTING) {
-			count++;
-		}
-	}
-
-	return count;
-}
+// function countHandledImages() {
+//
+// 	var count = 0;
+// 	var len = handlingOrHandledImageList.length;
+// 	for (var i = 0; i < len; i++) {
+// 		var imageInfo = handlingOrHandledImageList[i];
+// 		if (imageInfo.status != MatchStatus.STARTING) {
+// 			count++;
+// 		}
+// 	}
+//
+// 	return count;
+// }
 //
 // 	//                    MatchStatus.STARTING
 // 	// imageInfo.status = MatchStatus.NOTMATCH;
@@ -199,9 +199,9 @@ function receiveTargetImageInfo(data){
 	    data.hasOwnProperty("imagePath") && data.imagePath != null) {
 
 		var ifMatch = false;
-		var len = handlingImageList.length;
+		var len = handlingOrHandledImageList.length;
 		for (var i = 0; i < len; i++) {
-			var imageInfo = handlingImageList[i];
+			var imageInfo = handlingOrHandledImageList[i];
 			if (imageInfo.imagePath == data.imagePath) {
 
 				handledNumber++;
@@ -276,8 +276,7 @@ function getImageThenSendToServer(imageInfo, type) {
 		imageObj = new Image();
 	}
 
-
-	//如果是放在上面new Image(), 則type就只是第一次的值而已, 不會改
+	//如果是放在上面new Image()裡, 則type就只是第一次的值而已, 不會變
 	imageObj.onerror = handleLoadError;
 	imageObj.onload = handleLoadOK;
 
@@ -287,7 +286,7 @@ function getImageThenSendToServer(imageInfo, type) {
 		//console.log("image error:%s", imageObj);
 
 		if (type == CompareType.TARGET) {
-			//console.log("load target image fail and continue");
+			console.log("load target image fail");
 			imageInfo.status = MatchStatus.LOADFAIL;
 			handledNumber++;
 			updateStatusText();
@@ -381,7 +380,7 @@ function getNextImageToHandle(){
 			status: MatchStatus.STARTING,
 		};
 
-		handlingImageList.push(imageInfo);
+		handlingOrHandledImageList.push(imageInfo);
 		waittingImageList.shift();
 		getImageThenSendToServer(imageInfo, CompareType.TARGET);
 	} else {
@@ -541,7 +540,7 @@ function loadDir(dir, fileName) {
 
     // 或是每次在render 時再去改?? yes
 		// for (var i=0; i<num_Images; i++){
-		// 	var imageInfo = handlingImageList[i];
+		// 	var imageInfo = handlingOrHandledImageList[i];
 		// 	waittingImageList.push(imageInfo.imagePath);
 		// }
 	}
@@ -583,7 +582,7 @@ function loadDir(dir, fileName) {
 		// 		status: MatchStatus.STARTING
 		// 	};
 		//
-		// 	handlingImageList.push(imageInfo);
+		// 	handlingOrHandledImageList.push(imageInfo);
 		// 	waittingImageList.shift();
 		// 	getImageThenSendToServer(selectedImage, CompareType.TARGET);
 		// }
