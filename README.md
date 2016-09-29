@@ -23,6 +23,7 @@
 9. use readAsArrayBuffer to read a image file and send to the server instead of the current way, which adapts FILE -decoding> Image object -draw/copy> canvas -> jpeg-base64-DataURL then send. memory/cpu related. 
 10. Linux, Windows support
 11. When getting the response from the server, use dictionary to lookup the image object instead of using array. cpu related
+12. Python 2.7 -> Python 3.5
 
 # Before run in in development environment or download a packaged app, you need Docker for Mac.
 
