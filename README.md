@@ -7,7 +7,7 @@
 ### Known Issues:
 1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon.
 2. Slow python WebSocket in Docker. Need to debug it.
-3. * cpu usage is too high. (或許可以參考openface裡的memory usage)
+3. * cpu usage is too high. (maybe the code in openface can be as a reference)
 7. * memory usage is a little high
 4. sometimes html image object will load an image file in a wrong way. Such as rotating a 90/180 degree somehow. It is exif issue.
 5. ~~If the folder contain too many images(may hundred of files), "out of memory" will happen and throw exception, net::ERR_INSUFFICIENT_RESOURCES.~~
