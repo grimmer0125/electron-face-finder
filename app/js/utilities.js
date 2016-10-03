@@ -4,20 +4,14 @@ var constants = require('./constants');
 
 module.exports = {
 	processSpecialCharacter: function(str){
-		// var str = "Visit Microsoft!";
-		//連/都變成%2f http://www.w3schools.com/tags/ref_urlencode.asp
 
+		if (process.platform === "darwin"){
+			str = encodeURIComponent(str).replace(/%2F/g, "/");
+		} else if (process.platform === "win32"){
+		  str = encodeURIComponent(str).replace(/%3A/g, ":").replace(/%5C/g, "\\");
+		}
 
-		// console.log("a:", encodeURIComponent(str));
-
-		// console.log("b:", encodeURI(str));
-
-		// var res = str.replace(/%/g, "%25");
-		// res = res.replace(/#/g, "%23");
-		var res = encodeURIComponent(str).replace(/%2F/g, "/");
-		// console.log("final:", res);
-
-		return res;
+		return str;
 	},
 	isSupportedImageFile: function(file) {
 		var extension = path.extname(file);

@@ -32,14 +32,7 @@ module.exports = {
       // workaround to solving can not catch problem
       if( self.socket && self.socket.readyState === 1){
 
-        // if (this.sendQueue.length ==1){
-        //
-        // } else {
-          // firstData = this.sendQueue[0];
         this.socket.send(this.sendQueue[0]);
-        // }
-
-        // this.socket.send(firstData);
         
         this.sendQueue.shift();
         if(this.sendQueue.length>0){
@@ -92,7 +85,6 @@ module.exports = {
       self.sendData();
     };
     this.socket.onmessage = function(e) {
-      // console.log("process type2:", process.type)
 
       // console.log("get data !!!! :", e.data);
       var data = JSON.parse(e.data);

@@ -1,7 +1,7 @@
 'use strict';
 
+// macos: darwin
 console.log("os:", process.platform)
-// darwin
 
 var utilities = require('./js/utilities');
 
@@ -18,22 +18,12 @@ var constants = require('./js/constants');
 var client = require('./js/ws-client');
 client.createSocket();
 
-
-// var //console.log;
-
 // for debugging
 if (process.env.NODE_ENV == "debug" || process.env.NODE_ENV == "dev"){
-	//console.log("require getpixels");
 	var getPixels = require("get-pixels")
-	// //console.log = function(log){
-		// //console.log(arguments);
-	// } ;
 }	else {
-	// //console.log = function(log){
-	// };
+
 }
-
-
 
 // jquery selectors
 var $currentImage = $('#currentImage'),
@@ -72,7 +62,6 @@ var MatchStatus = {
 var t1, t2, t3;
 var imageObj, canvas, showImageObj, context;
 
-
 function resetWhenGetNoFaceSourceInfo(){
 	sourceFilePath = -1;
 	$sourceImage[0].src = null;
@@ -83,8 +72,7 @@ function resetAllImagesStatusWhenTarget(){
 	imageFiles = [];
 
 	// reset handling
-	// step1: copy data to waitting, no need this step
-	// step2:
+	// step1:
 	handlingOrHandledImageList = [];
 	handledNumber = 0;
 
@@ -112,16 +100,11 @@ function resetAllImagesStatus() {
 	return;
 }
 
-// function onlyUpdateHandledText(){
-//
-// }
-
 function updateStatusText() {
-	// var index = imageFiles.indexOf(currentImageFileIndex);
 	// var currentImage = (index + 1);
 	// var totalMatched = imageFiles.length;
 	// var totalFiles = (waittingImageList.length+handlingOrHandledImageList.length);
-	// var totalHandled = countHandledImages();
+
 	//handling includes failed
 	var totalHandling = handlingOrHandledImageList.length;
 
@@ -147,37 +130,21 @@ function updateStatusText() {
 //
 // 	return count;
 // }
-//
-// 	//                    MatchStatus.STARTING
-// 	// imageInfo.status = MatchStatus.NOTMATCH;
-// 	// imageInfo.status = MatchStatus.NOFACE;
-//
-// 	return count;
-// }
-
 
 function receiveSourceImageInfo(data){
-	// if (data.hasOwnProperty("type") && data.type == CompareType.SOURCE) {
 
-	//console.log("Res: source info!!");
+	if (data.hasOwnProperty("representationStatus")==false || data.representationStatus == false) {
 
-	if (data.representationStatus == false) {
-		//console.log("Res: source representation info fail!!!");
+		resetWhenGetNoFaceSourceInfo();
 
 		alert('Can not find any face in the source image. please select again');
-		resetWhenGetNoFaceSourceInfo();
 		return;
 	}
 
-
-	//console.log("selected source, now start to match");
 	getNextImageToHandle();
 
 	// var num_Images = waittingImageList.length;
 	// if (num_Images > 0) {
-
-		// 理論上如果server是非同步, 那不一定, 但應該實際上會是這樣沒錯, 不然就是選到空的folder
-
 		// for (var i = 0; i < num_Images; i++) {
 		// 	var selectedImageInfo = waittingImageList[i];
 		// 	getImageThenSendToServer(selectedImageInfo.imagePath, CompareType.TARGET);
@@ -188,15 +155,6 @@ function receiveSourceImageInfo(data){
 }
 
 function receiveTargetImageInfo(data){
-
-	// var ifMatch = null,
-	// 	imagePath = null;
-	// if (data.hasOwnProperty("ifMatch")) {
-	// 	ifMatch = data.ifMatch;
-	// }
-	// if (data.hasOwnProperty("imagePath")) {
-	// 	imagePath = data.imagePath;
-	// }
 
 	if (data.hasOwnProperty("ifMatch") && data.ifMatch !== null &&
 	    data.hasOwnProperty("imagePath") && data.imagePath != null) {
@@ -209,15 +167,11 @@ function receiveTargetImageInfo(data){
 
 				handledNumber++;
 
-				// match時一定會讓 matched +1 / total / handling
 				if (data.ifMatch) {
 					imageInfo.status = MatchStatus.MATCH;
 					imageFiles.push(imageInfo.imagePath)
 
-					// try to show the image
 					if (imageFiles.length == 1) {
-						// var selectedImageIndex = 0;
-						//console.log('to show image !!!');
 
 						showImage(0);
 					}
@@ -266,12 +220,13 @@ function imageInfoReceiver(data) {
 
 	receiveTargetImageInfo(data);
 }
+
 client.registerReceiveHandler(imageInfoReceiver);
 
 function getImageThenSendToServer(imageInfo, type) {
-	// //console.log("process type0:", process.type)
 
 	// var imagePath = imageInfo.imagePath;
+
 	//console.log("get image then send to server,type:%s;%s", type, imageInfo.imagePath);
 	// if(!t1){
 	// 	t1 = new Date().getTime();
@@ -288,7 +243,6 @@ function getImageThenSendToServer(imageInfo, type) {
 	imageObj.src = imageInfo.imagePath;
 
 	function handleLoadError() {
-		//console.log("image error:%s", imageObj);
 
 		if (type == CompareType.TARGET) {
 			// console.log("load target image fail");
@@ -307,31 +261,12 @@ function getImageThenSendToServer(imageInfo, type) {
 		}
 	}
 
-	// imageObj.onabort = function() {
-	// 	//console.log("image abort:%s", imageObj);
-	//
-	// 	if (type == CompareType.TARGET) {
-	// 		//console.log("load target image fail and continue");
-	// 		getNextImageToHandle();
-	// 	} else {
-	// 		resetWhenGetNoFaceSourceInfo();
-	// 		alert('source image file has error, please change');
-	// 	}
-	// };
-
-	// var str = "Visit Microsoft!";
-  // var res = str.replace("Microsoft", "W3Schools");
-
-
 	function handleLoadOK() {
-
-		//console.log("type:", type)
 
 		// if(!t2){
 		// 	t2 = new Date().getTime();
 		// }
 
-		// var imageObj = $currentImage[0];
 		if(!canvas){
 			canvas = document.createElement('canvas');
 		  context = canvas.getContext('2d');
@@ -349,8 +284,8 @@ function getImageThenSendToServer(imageInfo, type) {
 		// 	t3 = new Date().getTime();
 		// }
 
-		//console.log('Image:%s. Width:%s,height:%s', imageInfo.imagePath, imageObj.width, imageObj.height);
-		// //console.log("file ->image:%s;image obj -> jpeg:%s", (t2 - t1), (t3 - t2));
+		// console.log('Image:%s. Width:%s,height:%s', imageInfo.imagePath, imageObj.width, imageObj.height);
+		// console.log("file ->image:%s;image obj -> jpeg:%s", (t2 - t1), (t3 - t2));
 
 		var data = {
 			imagePath: imageInfo.imagePath,
@@ -367,15 +302,11 @@ function getImageThenSendToServer(imageInfo, type) {
 			// getNextImageToHandle();
 		} else {
 			//console.log("load source face ok then send ")
-			// if(type == CompareType.SOURCE){
-				// imageFiles = [];
-				// currentImageFileIndex = '';
+
 			resetAllImagesStatus();
 			updateStatusText();
 			sourceFilePath = imageInfo.imagePath;
-			$sourceImage[0].src = sourceFilePath; //.src = sourceFilePath;//why not use sourceFilePath originally? filePath;
-			// }
-
+			$sourceImage[0].src = sourceFilePath;
 		}
 	}
 }
@@ -383,7 +314,6 @@ function getImageThenSendToServer(imageInfo, type) {
 function getNextImageToHandle(){
 	if (waittingImageList.length>0){
 		//console.log("get file from waittingImageList ok")
-		// var selectedImage = waittingImageList[0];
 
 		var imageInfo = {
 			imagePath: waittingImageList[0],
@@ -408,12 +338,12 @@ function showImage(index) {
 	if(!showImageObj){
 		showImageObj = new Image();
 	}
-	showImageObj.src = imageFiles[index]; //'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
+	showImageObj.src = imageFiles[index];
 	showImageObj.onload = function() {
 
 		$currentImage[0].src = showImageObj.src;
 		// $currentImage.attr('src', imageFiles[index]).load(function() {
-		currentImageFileIndex = index;//imageFiles[index];
+		currentImageFileIndex = index;
 		//console.log('show current image:', imageFiles[index]);
 
 		// Hide show previous/next if there are no more/less files.
@@ -422,8 +352,6 @@ function showImage(index) {
 
 		// set the stats text
 		updateStatusText();
-		// var statsText = (index + 1) + ' / ' + imageFiles.length;
-		// $directoryStats.text(statsText);
 
 		ipc.send('image-changed', imageFiles[index]);
 	};
@@ -511,31 +439,18 @@ function testArrayBufferJSON(imageFile) {
 
 }
 
-// p.s 不管那一個方法最好還是加try catch for loading images
-
+// 關於 out of memory
 // 方法1:, 使用process.nextTick, 但說不定還是會爆掉.
 //       從 run- all, callback1, callback2改成
 // run1 -load run2 load run3 run-callback1
-
-// 方法2: 得到每一張callback後才去處理下一張, 可能會ok, 但萬一onload因為莫名的原因沒有被trigger ?
-
+// 方法2(current): 得到每一張callback後才去處理下一張, 可能會ok, 但萬一onload因為莫名的原因沒有被trigger ?
 // 方法3:, 預設每100張處理一次, 這樣還是有可能會爆掉?
-
 // 方法4: 爆掉時, 再pause, 再等下一批
-
 // 看起來最好的是 方法3+try catch+ 方法4,因為如果是大量批次preview圖 也很難用方法2
 // 不過可能也同時要結合方法2....
-
-
-
+// p.s 不管那一個方法最好還是加try catch for loading images
 
 function loadDir(dir, fileName) {
-
-	// for testing
-	// if (true) {
-	// 	testArrayBufferJSON(fileName);
-	// 	return;
-	// }
 
 	// currentImageFileIndex = '';
 	// imageFiles = [];
@@ -563,23 +478,6 @@ function loadDir(dir, fileName) {
 	waittingImageList = tmpList;
 	updateStatusText();
 
-	//try to send by ws
-	// for (var i = 0; i < num_Images; i++) {
-	// 	var selectedImage = waittingImageList[i];
-	//
-	//
-	// 	if (sourceFilePath) {
-	// 		// //console.log("loop:",i);
-	// 		// process.nextTick(function(){
-	//
-	//
-	// 	}
-	//
-	// 	// waittingImageList.push(imageInfo);
-	//
-	// }
-	// //console.log("open folder after selecting source, end sending all match data");
-
 	if (sourceFilePath) {
 		//console.log("start to prepare images and match");
 
@@ -605,11 +503,8 @@ function loadDir(dir, fileName) {
 }
 
 var onOpenSource = function(filePath) {
-	//renderer process
-	//console.log('open Source and send to server, clear previous imageFiles');
 
-	// currentImageFileIndex = '';
-	console.log("source:",utilities.processSpecialCharacter((filePath + '')));
+	console.log("source:", utilities.processSpecialCharacter((filePath + '')));
 	var imageInfo = {
 		imagePath: utilities.processSpecialCharacter((filePath + '')),
 		status: MatchStatus.STARTING
