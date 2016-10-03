@@ -24,5 +24,5 @@
     "pack-osx": "npm run build-osx && electron-builder \"dist/osx/FaceFinder-darwin-x64/FaceFinder.app\" --platform=osx --out=\"dist/osx\"  --config=packager.json"
   },
   "author": "",
-  "license": "Apache License 2.0"
+  "license": "ISC"
 }
