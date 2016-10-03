@@ -1,6 +1,8 @@
 ## Currently this is only tested on Mac platform. This experimental project is based on the following projects.
-1. [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface),Apache 2.0 License. Modify its Dockerfile.
-2. [https://github.com/yyosifov/image-viewer](https://github.com/yyosifov/image-viewer),  ISC License. Most of UI are from it.
+1. [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface), Apache 2.0 License. Modify its Dockerfile, [https://github.com/grimmer0125/openface](https://github.com/grimmer0125/openface) and used its trained face NN data and python library in this project. 
+2. [https://github.com/yyosifov/image-viewer](https://github.com/yyosifov/image-viewer), ISC License. Most of UI and Electron related codes of this project are modified from it.
+
+### This electron-face-finder application will automatically launch the docker container of openface which has a python websocket server running. 
 
 ### Known Issues:
 1. It seems that sometimes electron side will send partial data to the python sever running in the previous docker container. It may happen when you close the app and immediately restart it and operate it very soon.
