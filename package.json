@@ -1,7 +1,7 @@
 {
   "name": "electron-face-finder",
   "productName": "FaceFinder",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "To find the images having the specified face.",
   "main": "main.js",
   "dependencies": {
