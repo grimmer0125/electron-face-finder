@@ -74,4 +74,4 @@ A cross-platform Face Matcher based on Electron. It runs on OS X, Windows and Li
 - ~~Open an Image File and browse the images inside the same directory~~
 - Fast navigation through the images via Left/Right keyboard buttons
 - Rotate an image clockwise/anti-clockwise
-- Save/Move the image to a new location
+- ~~Save/Move the image to a new location~~
