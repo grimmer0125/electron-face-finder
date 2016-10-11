@@ -63,7 +63,7 @@ A cross-platform Face Matcher based on Electron. It runs on OS X, Windows and Li
 
 # Preview
 
-- OS X:
+- OS X: (dog picture is from https://github.com/yyosifov/image-viewer)
 
 ![alt tag](https://grimmer.io/images/electron-dog.png)
 
