@@ -19,7 +19,7 @@
 3. study how to debug main process when this app is as a package app.
 4. Add connecting indicator to block UI operation and progress bar.
 5. Clean the sending queue when reseting
-6. Add Mac app signing.
+6. ~~Add Mac app signing.~~
 7. Support multiple faces in an image file.
 8. ~~try to support the image path having "%"~~
 9. use readAsArrayBuffer to read a image file and send to the server instead of the current way, which adapts FILE -decoding> Image object -draw/copy> canvas -> jpeg-base64-DataURL then send. memory/cpu related. 
@@ -50,7 +50,7 @@ After installing it, type `docker pull grimmer0125/openface-nostartdemo` to inst
 After installing it, type `docker pull grimmer0125/electricface`(web:[https://hub.docker.com/r/grimmer0125/electricface/](https://hub.docker.com/r/grimmer0125/electricface/)) to install the needed Docker image. Or you can use Docker-UI-tool [kinematic](https://kitematic.com/) to search the docker image (**electricface**) and install.
 
 ### Download the distributed binary packaged Electron app, FaceFinder.dmg form here.
-[http://goo.gl/GsNWJe](http://goo.gl/GsNWJe)
+[https://goo.gl/5IzCUj](https://goo.gl/5IzCUj)
 
 ### When use this applicaiton, please do not quit Docker. 
 
