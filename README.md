@@ -1,4 +1,6 @@
 ## Currently this is only tested on Mac platform. This experimental project is based on the following projects.
+
+[![Join the chat at https://gitter.im/grimmer0125/discuss](https://badges.gitter.im/grimmer0125/discuss.svg)](https://gitter.im/grimmer0125/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 1. [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface), Apache 2.0 License. Modify its Dockerfile, [https://github.com/grimmer0125/openface](https://github.com/grimmer0125/openface) and used its trained face NN data and python library in this project. 
 2. [https://github.com/yyosifov/image-viewer](https://github.com/yyosifov/image-viewer), ISC License. Most of UI and Electron related codes of this project are modified from it.
 
